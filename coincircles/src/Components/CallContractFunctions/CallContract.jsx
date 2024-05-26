@@ -1,37 +1,48 @@
 import Web3 from 'web3';
 import ContractAbi from "../../artifacts/contracts/Lock.sol/CoinCircles.json";
-import { ContractAddress } from "../Constants/Constants";
+import  ContractAddress from "../Constants/Constants";
 
 export const connectUser = async (setWalletAddress, setIsConnected, setContract, setProvider, setError) => {
     if (window.ethereum) {
-        try {
-            await window.ethereum.request({ method: 'eth_requestAccounts' });
-            const web3 = new Web3(window.ethereum);
-
-            setProvider(web3);
-            const contract = new web3.eth.Contract(ContractAbi.abi, ContractAddress);
-            setContract(contract);
-
-            const accounts = await web3.eth.getAccounts();
-            const connected = await contract.methods.users(accounts[0]).call();
-            if (connected.isConnected) {
-                setIsConnected(true);
-                setWalletAddress(accounts[0]);
-            } else {
-                const tx = await contract.methods.connect_user().send({ from: accounts[0] });
-                await tx.wait();
-                setWalletAddress(accounts[0]);
-                setIsConnected(true);
-            }
-        } catch (err) {
-            setError('Error connecting to wallet');
-            console.log(err);
+      try {
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
+        const web3 = new Web3(window.ethereum);
+        setProvider(web3);
+        const contractAddress = 'YOUR_CONTRACT_ADDRESS_HERE'; // Replace with your contract address
+        const contract = new web3.eth.Contract(ContractAbi.abi, contractAddress);
+        setContract(contract);
+        const accounts = await web3.eth.getAccounts();
+        const connected = await contract.methods.users(accounts[0]).call();
+        if (connected.isConnected) {
+          setIsConnected(true);
+          setWalletAddress(accounts[0]);
+        } else {
+          const tx = await contract.methods.connect_user().send({ from: accounts[0] });
+          console.log('Transaction hash:', tx.transactionHash);
+          // Wait for the transaction to be mined
+          await new Promise((resolve, reject) => {
+            web3.eth.sendSignedTransaction(tx.rawTransaction)
+              .once('receipt', (receipt) => {
+                console.log('Transaction confirmed:', receipt.transactionHash);
+                resolve();
+              })
+              .on('error', (error) => {
+                console.error('Error sending transaction:', error);
+                reject(error);
+              });
+          });
+          setWalletAddress(accounts[0]);
+          setIsConnected(true);
         }
+      } catch (err) {
+        setError('Error connecting to wallet');
+        console.log(err);
+      }
     } else {
-        setError('Please install Metamask');
-        console.log('Please install Metamask');
+      setError('Please install MetaMask');
+      console.log('Please install MetaMask');
     }
-};
+  };
 
 export const disconnectWallet = (setWalletAddress) => {
     setWalletAddress(null);
@@ -120,4 +131,4 @@ export const getAllChamas = async (setChamas, setErrorMessage) => {
         setErrorMessage('Error retrieving Chamas');
         console.log(e);
     }
-};
+};  
