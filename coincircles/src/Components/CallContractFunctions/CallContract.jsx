@@ -1,24 +1,24 @@
+import Web3 from 'web3';
 import ContractAbi from "../../artifacts/contracts/Lock.sol/CoinCircles.json";
 import { ContractAddress } from "../Constants/Constants";
-import { ethers } from "ethers";
 
 export const connectUser = async (setWalletAddress, setIsConnected, setContract, setProvider, setError) => {
     if (window.ethereum) {
         try {
-            let accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            let web3provider = new ethers.providers.Web3Provider(window.ethereum);
+            await window.ethereum.request({ method: 'eth_requestAccounts' });
+            const web3 = new Web3(window.ethereum);
 
-            setProvider(web3provider);
-            const contract = new ethers.Contract(ContractAddress, ContractAbi.abi, web3provider.getSigner(accounts[0]));
+            setProvider(web3);
+            const contract = new web3.eth.Contract(ContractAbi.abi, ContractAddress);
             setContract(contract);
 
-            // CHECK IF USER IS CONNECTED
-            const connected = await contract.users(accounts[0]);
+            const accounts = await web3.eth.getAccounts();
+            const connected = await contract.methods.users(accounts[0]).call();
             if (connected.isConnected) {
                 setIsConnected(true);
                 setWalletAddress(accounts[0]);
             } else {
-                const tx = await contract.connect_user();
+                const tx = await contract.methods.connect_user().send({ from: accounts[0] });
                 await tx.wait();
                 setWalletAddress(accounts[0]);
                 setIsConnected(true);
@@ -38,14 +38,12 @@ export const disconnectWallet = (setWalletAddress) => {
 };
 
 export const CreateChamas = async (_name, _purpose, _maxNoPeople, _minDeposit, _visibility, setSuccessMessage) => {
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
-    const contract = new ethers.Contract(ContractAddress, ContractAbi.abi, signer);
+    const web3 = new Web3(window.ethereum);
+    const accounts = await web3.eth.getAccounts();
+    const contract = new web3.eth.Contract(ContractAbi.abi, ContractAddress);
 
     try {
-        const tx = await contract.create_chama(_name, _maxNoPeople, _visibility, _minDeposit);
-        await tx.wait();
-        // Listen to events
+        const tx = await contract.methods.create_chama(_name, _maxNoPeople, _visibility, _minDeposit).send({ from: accounts[0] });
         contract.once('ChamaCreated', (chamaId, name) => {
             setSuccessMessage(`Chama ${name} created successfully with ID ${chamaId}`);
         });
@@ -57,13 +55,12 @@ export const CreateChamas = async (_name, _purpose, _maxNoPeople, _minDeposit, _
 
 // Function to join a Chama
 export const joinChama = async (_name, setSuccessMessage, setErrorMessage) => {
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
-    const contract = new ethers.Contract(ContractAddress, ContractAbi.abi, signer);
+    const web3 = new Web3(window.ethereum);
+    const accounts = await web3.eth.getAccounts();
+    const contract = new web3.eth.Contract(ContractAbi.abi, ContractAddress);
 
     try {
-        const tx = await contract.join_chama(_name);
-        await tx.wait();
+        const tx = await contract.methods.join_chama(_name).send({ from: accounts[0] });
         contract.once('UserJoinedChama', (name, user_address) => {
             setSuccessMessage(`User ${user_address} joined Chama ${name}`);
         });
@@ -76,15 +73,14 @@ export const joinChama = async (_name, setSuccessMessage, setErrorMessage) => {
 
 // Function to contribute funds to a Chama
 export const contributeFunds = async (_name, _amount, setSuccessMessage, setErrorMessage) => {
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
-    const contract = new ethers.Contract(ContractAddress, ContractAbi.abi, signer);
+    const web3 = new Web3(window.ethereum);
+    const accounts = await web3.eth.getAccounts();
+    const contract = new web3.eth.Contract(ContractAbi.abi, ContractAddress);
 
     try {
-        const tx = await contract.contributeFunds(_name, { value: ethers.utils.parseEther(_amount) });
-        await tx.wait();
+        const tx = await contract.methods.contributeFunds(_name).send({ from: accounts[0], value: web3.utils.toWei(_amount, 'ether') });
         contract.once('ContributionMade', (name, user_address, amount) => {
-            setSuccessMessage(`Contribution of ${amount} made by ${user_address} to Chama ${name}`);
+            setSuccessMessage(`Contribution of ${web3.utils.fromWei(amount, 'ether')} made by ${user_address} to Chama ${name}`);
         });
         console.log('Contribution made successfully');
     } catch (e) {
@@ -95,13 +91,12 @@ export const contributeFunds = async (_name, _amount, setSuccessMessage, setErro
 
 // Function to vote for a recipient
 export const voteForRecipient = async (_name, _recipient, setSuccessMessage, setErrorMessage) => {
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
-    const contract = new ethers.Contract(ContractAddress, ContractAbi.abi, signer);
+    const web3 = new Web3(window.ethereum);
+    const accounts = await web3.eth.getAccounts();
+    const contract = new web3.eth.Contract(ContractAbi.abi, ContractAddress);
 
     try {
-        const tx = await contract.voteForRecipient(_name, _recipient);
-        await tx.wait();
+        const tx = await contract.methods.voteForRecipient(_name, _recipient).send({ from: accounts[0] });
         contract.once('VoteCast', (name, voter, recipient) => {
             setSuccessMessage(`Vote cast by ${voter} for ${recipient} in Chama ${name}`);
         });
@@ -114,12 +109,11 @@ export const voteForRecipient = async (_name, _recipient, setSuccessMessage, set
 
 // Function to get all Chamas
 export const getAllChamas = async (setChamas, setErrorMessage) => {
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
-    const contract = new ethers.Contract(ContractAddress, ContractAbi.abi, signer);
+    const web3 = new Web3(window.ethereum);
+    const contract = new web3.eth.Contract(ContractAbi.abi, ContractAddress);
 
     try {
-        const chamas = await contract.getAllChamas();
+        const chamas = await contract.methods.getAllChamas().call();
         setChamas(chamas);
         console.log('Chamas retrieved successfully');
     } catch (e) {
