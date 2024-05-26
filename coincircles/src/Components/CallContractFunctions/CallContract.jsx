@@ -1,6 +1,6 @@
 import Web3 from 'web3';
 import ContractAbi from "../../artifacts/contracts/Lock.sol/CoinCircles.json";
-import  ContractAddress from "../Constants/Constants";
+import { ContractAddress } from "../Constants/Constants";
 
 export const connectUser = async (setWalletAddress, setIsConnected, setContract, setProvider, setError) => {
     if (window.ethereum) {
@@ -8,7 +8,7 @@ export const connectUser = async (setWalletAddress, setIsConnected, setContract,
         await window.ethereum.request({ method: 'eth_requestAccounts' });
         const web3 = new Web3(window.ethereum);
         setProvider(web3);
-        const contractAddress = 'YOUR_CONTRACT_ADDRESS_HERE'; // Replace with your contract address
+        const contractAddress = ContractAddress; // Replace with your contract address
         const contract = new web3.eth.Contract(ContractAbi.abi, contractAddress);
         setContract(contract);
         const accounts = await web3.eth.getAccounts();
