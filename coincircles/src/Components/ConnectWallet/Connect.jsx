@@ -1,8 +1,9 @@
 import {  useState } from 'react';
 import Button from "react-bootstrap/Button";
+// import { connectUser } from '../CallContractFunctions/CallContract';
 import { connectUser } from '../CallContractFunctions/CallContract';
-import "./Connect.css"
-import { disconnectWallet } from '../CallContractFunctions/ContractFunctions';
+// import "./Connect.css"
+import { disconnectWallet } from '../CallContractFunctions/CallContract';
 export default function ConnectWallet() {
   const [walletAddress,setWalletAddress] = useState(null);
   const [error, setError] = useState(null);
