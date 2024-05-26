@@ -19,7 +19,7 @@ export const connectUser = async (setWalletAddress, setIsConnected, setContract,
             console.log("Accounts:", accounts);
             setProvider(web3); // Set provider to the initialized web3 instance
 
-            const contract = new web3.eth.Contract(ContractAbi.abi, ContractAddress); // Use web3 for contract instantiation
+            const contract = new web3.eth.Contract(ContractAbi, ContractAddress); // Use web3 for contract instantiation
             setContract(contract);
 
             const connected = await contract.methods.users(accounts[0]).call();
