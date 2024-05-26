@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Form, Button, Container, Alert } from 'react-bootstrap';
-import { CreateChamas } from '../CallContractFunctions/CallContract';
+import CreateChamas from '../CallContractFunctions/CallContract';
 
 const ChamaForm = () => {
   const [name, setName] = useState('');
@@ -14,7 +14,8 @@ const ChamaForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await CreateChamas(name, maxNoOfPeople, visibility, minimumNoOfPeople, targetAmountPerRound, setSuccessMessage);
+      await CreateChamas(name, maxNoOfPeople, visibility, minimumNoOfPeople, targetAmountPerRound);
+      setSuccessMessage(`Chama ${name} created successfully`);
       setErrorMessage('');
     } catch (err) {
       setErrorMessage('Error creating chama. Please try again.');
