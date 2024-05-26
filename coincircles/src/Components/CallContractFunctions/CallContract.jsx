@@ -8,39 +8,42 @@ let web3;
 
 
 
+
+
 export const connectUser = async (setWalletAddress, setIsConnected, setContract, setProvider, setError, provider) => {
-    if (!provider) {
-        console.error('Provider is not provided');
-        setError('Provider is not provided');
-        return;
-    }
+    if (window.ethereum) {
+        const web3 = new Web3(window.ethereum); // Initialize Web3 with window.ethereum
+        try {
+            console.log("Provider detected, requesting accounts...");
+            const accounts = await web3.eth.requestAccounts(); // Use web3 for account access
+            console.log("Accounts:", accounts);
+            setProvider(web3); // Set provider to the initialized web3 instance
 
-    try {
-        console.log("Provider detected, requesting accounts...");
-        const accounts = await provider.eth.requestAccounts();
-        console.log("Accounts:", accounts);
-        setProvider(provider);
+            const contract = new web3.eth.Contract(ContractAbi.abi, ContractAddress); // Use web3 for contract instantiation
+            setContract(contract);
 
-        const contract = new provider.eth.Contract(ContractAbi.abi, ContractAddress);
-        setContract(contract);
-
-        const connected = await contract.methods.users(accounts[0]).call();
-        console.log("User connected status:", connected);
-        if (connected.isConnected) {
-            setIsConnected(true);
-            setWalletAddress(accounts[0]);
-        } else {
-            console.log("User not connected, sending transaction to connect...");
-            const tx = await contract.methods.connect_user().send({ from: accounts[0] });
-            console.log("Transaction:", tx);
-            setWalletAddress(accounts[0]);
-            setIsConnected(true);
+            const connected = await contract.methods.users(accounts[0]).call();
+            console.log("User connected status:", connected);
+            if (connected.isConnected) {
+                setIsConnected(true);
+                setWalletAddress(accounts[0]);
+            } else {
+                console.log("User not connected, sending transaction to connect...");
+                const tx = await contract.methods.connect_user().send({ from: accounts[0] });
+                console.log("Transaction:", tx);
+                setWalletAddress(accounts[0]);
+                setIsConnected(true);
+            }
+        } catch (err) {
+            setError('Error connecting to wallet');
+            console.log("Error connecting to wallet:", err);
         }
-    } catch (err) {
-        setError('Error connecting to wallet');
-        console.error("Error connecting to wallet:", err);
+    } else {
+        setError('Please install MetaMask');
+        console.log('Please install MetaMask');
     }
 };
+
 
 
 
