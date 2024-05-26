@@ -15,7 +15,7 @@ export default function ConnectWallet() {
     if (typeof window.ethereum !== 'undefined') {
       const web3 = new Web3(window.ethereum);
       try {
-        await window.ethereum.enable(); // Request account access
+        await window.ethereum.request({ method: 'eth_requestAccounts' });// Request account access
         console.log("Ethereum enabled");
         return web3;
       } catch (error) {
