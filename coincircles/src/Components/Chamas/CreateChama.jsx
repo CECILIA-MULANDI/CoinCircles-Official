@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Form, Button, Container, Alert } from 'react-bootstrap';
-import CreateChamas from '../CallContractFunctions/CallContract';
+import {CreateChamas} from '../CallContractFunctions/CallContract';
 
 const ChamaForm = () => {
   const [name, setName] = useState('');
