@@ -11,7 +11,7 @@ export const connectUser=async(setWalletAddress,setIsConnected,setContract,setPr
             let web3provider=  new ethers.providers.Web3Provider(window.ethereum);
         
             setProvider(web3provider);
-            const contract= await new ethers.Contract(ContractAddress,ContractAbi.abi,web3provider.getSigner(accounts[0]));
+            const contract= await new ethers.Contract(ContractAddress,ContractAbi,web3provider.getSigner(accounts[0]));
             setContract(contract);
             
             // CHECK IF USER IS CONNECTED **
