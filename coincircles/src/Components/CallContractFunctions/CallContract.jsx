@@ -95,3 +95,17 @@ export const createChama = async (chamaName, maxMembers, chamaVisibility, minimu
     }
   };
 
+
+
+
+ export const getAllChamas = async () => {
+    try {
+      const contract = await connectToContract();
+      const chamaDetails = await contract.getAllChamas();
+      return chamaDetails;
+    } catch (error) {
+      console.error('Error getting chama details:', error);
+      throw error;
+    }
+  };
+

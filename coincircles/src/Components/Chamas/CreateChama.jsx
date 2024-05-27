@@ -10,17 +10,28 @@ const CreateChama = () => {
   const [targetAmount, setTargetAmount] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [messageTimeout, setMessageTimeout] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
   
     try {
       await createChama(chamaName, maxMembers, chamaVisibility, minimumMembers, targetAmount);
-      setSuccessMessage('Chama created successfully!');
+      setSuccessMessage(`Chama "${chamaName}" created successfully!`);
       resetForm();
+      clearTimeout(messageTimeout); // Clear any previous timeout
+      const timeout = setTimeout(() => {
+        setSuccessMessage('');
+      }, 5000); // Show success message for 5 seconds
+      setMessageTimeout(timeout);
     } catch (error) {
-      setErrorMessage(error.message); // Display the custom error message
+      setErrorMessage(error.message);
       setSuccessMessage('');
+      clearTimeout(messageTimeout); // Clear any previous timeout
+      const timeout = setTimeout(() => {
+        setErrorMessage('');
+      }, 5000); // Show error message for 5 seconds
+      setMessageTimeout(timeout);
     }
   };
 
@@ -31,13 +42,15 @@ const CreateChama = () => {
     setMinimumMembers('');
     setTargetAmount('');
     setErrorMessage('');
+    clearTimeout(messageTimeout); // Clear the message timeout
+    setMessageTimeout(null);
   };
 
   return (
     <div>
       <h2>Create Chama</h2>
       {errorMessage && <Alert variant="danger">{errorMessage}</Alert>}
-      {successMessage && <Alert variant="success">{successMessage}</Alert>}
+    {successMessage && <Alert variant="success">{successMessage}</Alert>}
       <Form onSubmit={handleSubmit}>
         <Form.Group controlId="chamaName">
           <Form.Label>Chama Name:</Form.Label>
