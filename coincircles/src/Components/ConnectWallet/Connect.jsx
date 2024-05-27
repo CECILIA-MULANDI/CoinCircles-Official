@@ -1,11 +1,12 @@
 // import { ethers } from 'ethers';
 import {  useState,useEffect } from 'react';
 import Button from "react-bootstrap/Button";
-import { ContractAddress } from "../Constants/Constants";
+
 import ContractAbi from "../../artifacts/contracts/Lock.sol/CoinCircles.json";
 import { connectUser } from '../CallContractFunctions/CallContract';
 import { ethers } from 'ethers';
 import { disconnectWallet } from '../CallContractFunctions/CallContract';
+const ContractAddress='0xAfFd205a78DD861128e9e8Ca1191aaBb9dbfD6CB'
 export default function ConnectWallet() {
   const [walletAddress,setWalletAddress] = useState(null);
   const [error, setError] = useState(null);
