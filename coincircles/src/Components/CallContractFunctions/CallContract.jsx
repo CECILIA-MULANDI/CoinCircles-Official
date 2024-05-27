@@ -7,10 +7,11 @@ export const connectUser = async (setWalletAddress, setIsConnected, setContract,
         try {
             await window.ethereum.request({ method: 'eth_requestAccounts' });
             const provider = new ethers.BrowserProvider(window.ethereum);
-            setProvider(provider);
-            const contract = new ethers.Contract(ContractAddress, ContractAbi.abi, provider.getSigner());
-            setContract(contract);
             const accounts = await provider.listAccounts();
+            setProvider(provider);
+            const contract =await new ethers.Contract(ContractAddress, ContractAbi.abi, provider.getSigner(accounts[0]));
+            setContract(contract);
+            
             const connected = await contract.users(accounts[0]);
             if (connected.isConnected) {
                 setIsConnected(true);
