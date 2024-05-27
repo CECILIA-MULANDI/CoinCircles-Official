@@ -16,8 +16,7 @@ const ChamaForm = () => {
     try {
       // Convert maxNoOfPeople and minimumNoOfPeople to integers
       const maxPeople = parseInt(maxNoOfPeople);
-      const minDeposit = parseInt(minimumNoOfPeople);
-  
+      const minPeople = parseInt(minimumNoOfPeople);
       // Ensure targetAmountPerRound is converted to a float
       const targetAmount = parseFloat(targetAmountPerRound);
   
@@ -26,11 +25,11 @@ const ChamaForm = () => {
         name,
         maxPeople,
         visibility,
-        minDeposit,
-        targetAmount
+        minPeople,
+        targetAmount,
+        setSuccessMessage,
+        setErrorMessage
       );
-  
-      setSuccessMessage("Chama created successfully");
       setErrorMessage('');
     } catch (err) {
       setErrorMessage('Error creating chama. Please try again.');

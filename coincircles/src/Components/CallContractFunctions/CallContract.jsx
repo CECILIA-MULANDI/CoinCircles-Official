@@ -48,32 +48,32 @@ export const disconnectWallet = (setWalletAddress) => {
     setWalletAddress(null);
 };
 
-export const CreateChamas = async (_name, _purpose, _maxNoPeople, _minDeposit, _visibility, setSuccessMessage, setErrorMessage) => {
+export const CreateChamas = async (_name, _maxNoOfPeople, _visibility, _minimumNoOfPeople, _targetAmountPerRound, setSuccessMessage, setErrorMessage) => {
     const web3 = new Web3(window.ethereum);
-
     try {
-        const accounts = await web3.eth.getAccounts();
-        const contract = new web3.eth.Contract(ContractAbi.abi, ContractAddress);
-
-        const tx = await contract.methods.create_chama(_name, _purpose, _maxNoPeople, _minDeposit, _visibility).send({ from: accounts[0] });
-
-        // Wait for transaction confirmation
-        const receipt = await tx.wait();
-
-        if (receipt.status) {
-            // Transaction successful, handle success
-            const chamaId = receipt.events.ChamaCreated.returnValues.chamaId;
-            const chamaName = receipt.events.ChamaCreated.returnValues.name;
-            setSuccessMessage(`Chama ${chamaName} created successfully with ID ${chamaId}`);
-        } else {
-            // Transaction failed, handle error
-            setErrorMessage('Error creating chama. Transaction failed.');
-        }
+      const accounts = await web3.eth.getAccounts();
+      const contract = new web3.eth.Contract(ContractAbi.abi, ContractAddress);
+      const tx = await contract.methods
+        .create_chama(_name, _maxNoOfPeople, _visibility, _minimumNoOfPeople, _targetAmountPerRound)
+        .send({ from: accounts[0] });
+  
+      // Wait for transaction confirmation
+      const receipt = await tx.wait();
+  
+      if (receipt.status) {
+        // Transaction successful, handle success
+        const chamaId = receipt.events.ChamaCreated.returnValues.chamaId; // Note the event name is ChamaCreated
+        const chamaName = receipt.events.ChamaCreated.returnValues.name; // Note the event name is ChamaCreated
+        setSuccessMessage(`Chama ${chamaName} created successfully with ID ${chamaId}`);
+      } else {
+        // Transaction failed, handle error
+        setErrorMessage('Error creating chama. Transaction failed.');
+      }
     } catch (error) {
-        console.error(error);
-        setErrorMessage('Error creating chama. Please try again.');
+      console.error(error);
+      setErrorMessage('Error creating chama. Please try again.');
     }
-};
+  };
 
 
 // Function to join a Chama
