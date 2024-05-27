@@ -109,3 +109,44 @@ export const createChama = async (chamaName, maxMembers, chamaVisibility, minimu
     }
   };
 
+
+
+ 
+
+export const joinChama = async (chamaName) => {
+  try {
+    const contract = await connectToContract();
+    const tx = await contract.join_chama(chamaName);
+    await tx.wait();
+    console.log(`Joined chama ${chamaName} successfully!`);
+  } catch (error) {
+    console.error('Error joining chama:', error);
+    throw error;
+  }
+};
+
+export const addMemberToPrivateChama = async (chamaName, newMember) => {
+  try {
+    const contract = await connectToContract();
+    const tx = await contract.add_members_to_privatechama(chamaName, newMember);
+    await tx.wait();
+    console.log(`Added ${newMember} to private chama ${chamaName} successfully!`);
+  } catch (error) {
+    console.error('Error adding member to private chama:', error);
+    throw error;
+  }
+};
+
+export const contributeFunds = async (chamaName, amount) => {
+  try {
+    const contract = await connectToContract();
+    const amountInWei = ethers.utils.parseEther(amount.toString());
+    const tx = await contract.contributeFunds(chamaName, { value: amountInWei });
+    await tx.wait();
+    console.log(`Contributed ${amount} ETH to chama ${chamaName} successfully!`);
+  } catch (error) {
+    console.error('Error contributing funds:', error);
+    throw error;
+  }
+};
+
