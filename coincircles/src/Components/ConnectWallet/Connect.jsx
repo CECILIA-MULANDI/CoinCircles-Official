@@ -1,5 +1,5 @@
-import Web3 from 'web3';
 import { useState, useEffect } from 'react';
+import { ethers } from 'ethers';
 import Button from 'react-bootstrap/Button';
 import { connectUser, disconnectWallet } from '../CallContractFunctions/CallContract';
 
@@ -10,14 +10,14 @@ export default function ConnectWallet() {
   const [contract, setContract] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
 
-  // Initialize Web3
-  const initializeWeb3 = async () => {
+  // Initialize ethers
+  const initializeEthers = async () => {
     if (typeof window.ethereum !== 'undefined') {
-      const web3 = new Web3(window.ethereum);
       try {
-        await window.ethereum.request({ method: 'eth_requestAccounts' });// Request account access
+        await window.ethereum.request({ method: 'eth_requestAccounts' }); // Request account access
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
         console.log("Ethereum enabled");
-        return web3;
+        return provider;
       } catch (error) {
         console.error("User denied account access");
         setError('User denied account access');
@@ -29,14 +29,14 @@ export default function ConnectWallet() {
   };
 
   useEffect(() => {
-    const setupWeb3 = async () => {
-      const web3Instance = await initializeWeb3();
-      if (web3Instance) {
-        setProvider(web3Instance);
+    const setupEthers = async () => {
+      const providerInstance = await initializeEthers();
+      if (providerInstance) {
+        setProvider(providerInstance);
       }
     };
 
-    setupWeb3();
+    setupEthers();
   }, []);
 
   return (
