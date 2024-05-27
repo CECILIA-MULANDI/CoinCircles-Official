@@ -52,7 +52,7 @@ export const CreateChamas = async (_name, _maxNoOfPeople, _visibility, _minimumN
     const web3 = new Web3(window.ethereum);
     try {
       const accounts = await web3.eth.getAccounts();
-      const contract = new web3.eth.Contract(ContractAbi.abi, ContractAddress);
+      const contract = new web3.eth.Contract(ContractAbi, ContractAddress);
       const tx = await contract.methods
         .create_chama(_name, _maxNoOfPeople, _visibility, _minimumNoOfPeople, _targetAmountPerRound)
         .send({ from: accounts[0] });
