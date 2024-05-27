@@ -1,55 +1,58 @@
+import ContractAbi from "../../artifacts/contracts/Lock.sol/CoinCircles.json";
+import { ContractAddress } from "../Constants/Constants";
+import { ethers } from "ethers";
 
-import ContractAbi from "../../artifacts/contracts/Lock.sol/CoinCircles.json"
-import {ContractAddress } from "../Constants/Constants"
-import { ethers } from "ethers"
+export const connectUser = async (
+  setWalletAddress,
+  setIsConnected,
+  setContract,
+  setProvider,
+  setError
+) => {
+  if (window.ethereum) {
+    try {
+      let accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+      console.log("Connected account:", accounts[0]);
 
-export const connectUser=async(setWalletAddress,setIsConnected,setContract,setProvider,setError)=>{
-    
-    if(window.ethereum){
-        try{
-            let accounts=await window.ethereum.request({method:'eth_requestAccounts'});
-            let web3provider=  await new ethers.providers.Web3Provider(window.ethereum);
-        
-            setProvider(web3provider);
-            const contract= await new ethers.Contract(ContractAddress,ContractAbi,web3provider.getSigner(accounts[0]));
-            setContract(contract);
-            console.log(contract);
-            
-            // CHECK IF USER IS CONNECTED **
-            const connected=await contract.users(accounts[0]);
-            console.log(connected)
-            if(connected.isConnected){
-                setIsConnected(true)
-                setWalletAddress(accounts[0]);
-             
-    
-            }else{
-                const tx = await contract.connect_user();
-                await tx.wait();
-                setWalletAddress(accounts[0]);
-                setIsConnected(true);
-        
-            }
-            
-            // setError(null);
+      let web3provider = await new ethers.providers.Web3Provider(window.ethereum);
+      setProvider(web3provider);
 
-        }catch(err){
-            // throw new Error('Error Connecting to wallet')
-            setError('Error connecting to wallet');
-            // console.error(err);
-            console.log(err)
+      const contract = await new ethers.Contract(
+        ContractAddress,
+        ContractAbi,
+        web3provider.getSigner(accounts[0])
+      );
+      setContract(contract);
 
-        }
-        }
-    else{
-        setError('Please install Metamask');
-        console.log('Please install Metamask')
+      // CHECK IF USER IS CONNECTED
+      const userDetails = await contract.users(accounts[0]);
+      console.log("User details:", userDetails);
+
+      if (userDetails.isConnected) {
+        console.log("User is already connected");
+        setIsConnected(true);
+        setWalletAddress(accounts[0]);
+      } else {
+        // User is not connected, proceed with connection
+        const tx = await contract.connect_user();
+        await tx.wait();
+        setWalletAddress(accounts[0]);
+        setIsConnected(true);
+      }
+    } catch (err) {
+      console.error("Error connecting to wallet:", err);
+      setError(`Error connecting to wallet: ${err.reason || err.message}`);
     }
+  } else {
+    setError("Please install Metamask");
+    console.log("Please install Metamask");
+  }
+};
 
-}
-export const disconnectWallet=(setWalletAddress)=>{
-    setWalletAddress(null)
-}
+export const disconnectWallet = (setWalletAddress) => {
+  setWalletAddress(null);
+};
+
 
 // export const CreateChamas=async(_name,_purpose,_maxNoPeople,_minDeposit,_visibility,setSuccessMessage)=>{
 //     // get provider
