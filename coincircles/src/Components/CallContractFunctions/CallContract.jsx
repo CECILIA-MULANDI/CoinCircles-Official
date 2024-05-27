@@ -48,26 +48,32 @@ export const disconnectWallet = (setWalletAddress) => {
     setWalletAddress(null);
 };
 
-export const CreateChamas = async (_name, _maxNoOfPeople, _visibility, _minimumNoOfPeople, _targetAmountPerRound, setSuccessMessage) => {
+export const CreateChamas = async (_name, _maxNoOfPeople, _visibility, _minimumNoOfPeople, _targetAmountPerRound) => {
     const web3 = new Web3(window.ethereum);
     const accounts = await web3.eth.getAccounts();
     const contract = new web3.eth.Contract(ContractAbi.abi, ContractAddress);
   
-    try {
-      await contract.methods
+    return new Promise((resolve, reject) => {
+      contract.methods
         .create_chama(_name, _maxNoOfPeople, _visibility, _minimumNoOfPeople, _targetAmountPerRound)
-        .send({ from: accounts[0] });
-  
-      contract.once('ChamaCreated', (chamaId, name) => {
-        setSuccessMessage(`Chama ${name} created successfully with ID ${chamaId}`);
-      });
-  
-      console.log('Chama created successfully');
-    } catch (e) {
-      console.log(e);
-    }
+        .send({ from: accounts[0] })
+        .on('error', (error) => {
+          reject(error);
+        })
+        .on('transactionHash', (transactionHash) => {
+          console.log('Transaction Hash:', transactionHash);
+        })
+        .on('receipt', (receipt) => {
+          console.log('Receipt:', receipt);
+        })
+        .on('confirmation', (confirmationNumber, receipt) => {
+          console.log('Confirmation Number:', confirmationNumber);
+        })
+        .on('ChamaCreated', (chamaId, name) => {
+          resolve({ chamaId, name });
+        });
+    });
   };
-
 // Function to join a Chama
 export const joinChama = async (_name, setSuccessMessage, setErrorMessage) => {
     const web3 = new Web3(window.ethereum);

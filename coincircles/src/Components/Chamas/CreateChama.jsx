@@ -14,8 +14,8 @@ const ChamaForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await CreateChamas(name, maxNoOfPeople, visibility, minimumNoOfPeople, targetAmountPerRound);
-      setSuccessMessage(`Chama ${name} created successfully`);
+      const { chamaId, name } = await CreateChamas(name, maxNoOfPeople, visibility, minimumNoOfPeople, targetAmountPerRound);
+      setSuccessMessage(`Chama ${name} created successfully with ID ${chamaId}`);
       setErrorMessage('');
     } catch (err) {
       setErrorMessage('Error creating chama. Please try again.');
