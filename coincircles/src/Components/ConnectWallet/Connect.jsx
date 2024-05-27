@@ -1,8 +1,8 @@
 // import { ethers } from 'ethers';
 import {  useState,useEffect } from 'react';
 import Button from "react-bootstrap/Button";
-import { ContractAddress } from "../Constants/Constants"
-import ContractAbi from "../../artifacts/contracts/Lock.sol/CoinCircles.json"
+import { ContractAddress } from "../Constants/Constants";
+import ContractAbi from "../../artifacts/contracts/Lock.sol/CoinCircles.json";
 import { connectUser } from '../CallContractFunctions/CallContract';
 import { ethers } from 'ethers';
 import { disconnectWallet } from '../CallContractFunctions/CallContract';
