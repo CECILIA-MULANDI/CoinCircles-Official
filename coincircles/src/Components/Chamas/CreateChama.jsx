@@ -1,112 +1,89 @@
-// import React, { useState } from 'react';
-// import { Form, Button, Container, Alert } from 'react-bootstrap';
-// import {CreateChamas} from '../CallContractFunctions/CallContract';
+import React, { useState } from 'react';
+import { createChama } from '../CallContractFunctions/CallContract';
 
-// const ChamaForm = () => {
-//   const [name, setName] = useState('');
-//   const [maxNoOfPeople, setMaxNoOfPeople] = useState('');
-//   const [visibility, setVisibility] = useState('public');
-//   const [minimumNoOfPeople, setMinimumNoOfPeople] = useState('');
-//   const [targetAmountPerRound, setTargetAmountPerRound] = useState('');
-//   const [successMessage, setSuccessMessage] = useState('');
-//   const [errorMessage, setErrorMessage] = useState('');
+export default function CreateChama  ()  {
+  // State variables for form inputs
+  const [chamaName, setChamaName] = useState('');
+  const [maxMembers, setMaxMembers] = useState('');
+  const [chamaVisibility, setChamaVisibility] = useState('Public');
+  const [minimumMembers, setMinimumMembers] = useState('');
+  const [targetAmount, setTargetAmount] = useState('');
 
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     try {
-//       // Convert maxNoOfPeople and minimumNoOfPeople to integers
-//       const maxPeople = parseInt(maxNoOfPeople);
-//       const minPeople = parseInt(minimumNoOfPeople);
-//       // Ensure targetAmountPerRound is converted to a float
-//       const targetAmount = parseFloat(targetAmountPerRound);
-  
-//       // Call CreateChamas function with the correct parameters
-//       await CreateChamas(
-//         name,
-//         maxPeople,
-//         visibility,
-//         minPeople,
-//         targetAmount,
-//         setSuccessMessage,
-//         setErrorMessage
-//       );
-//       setErrorMessage('');
-//     } catch (err) {
-//       setErrorMessage('Error creating chama. Please try again.');
-//       console.error(err);
-//     }
-//   };
-  
+  // Function to handle form submission
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-//   return (
-//     <Container>
-//       <h1 className="my-4">Create Chama</h1>
-//       {successMessage && <Alert variant="success">{successMessage}</Alert>}
-//       {errorMessage && <Alert variant="danger">{errorMessage}</Alert>}
-//       <Form onSubmit={handleSubmit}>
-//         <Form.Group controlId="formName">
-//           <Form.Label>Name</Form.Label>
-//           <Form.Control
-//             type="text"
-//             placeholder="Enter chama name"
-//             value={name}
-//             onChange={(e) => setName(e.target.value)}
-//             required
-//           />
-//         </Form.Group>
+    try {
+      await createChama(chamaName, maxMembers, chamaVisibility, minimumMembers, targetAmount);
+      // Reset form inputs
+      setChamaName('');
+      setMaxMembers('');
+      setChamaVisibility('Public');
+      setMinimumMembers('');
+      setTargetAmount('');
+    } catch (error) {
+      console.error('Error creating chama:', error);
+    }
+  };
+  return (
+    <div>
+      <h2>Create Chama</h2>
+      <form onSubmit={handleSubmit}>
+        <div>
+          <label htmlFor="chamaName">Chama Name:</label>
+          <input
+            type="text"
+            id="chamaName"
+            value={chamaName}
+            onChange={(e) => setChamaName(e.target.value)}
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="maxMembers">Maximum Members:</label>
+          <input
+            type="number"
+            id="maxMembers"
+            value={maxMembers}
+            onChange={(e) => setMaxMembers(e.target.value)}
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="chamaVisibility">Chama Visibility:</label>
+          <select
+            id="chamaVisibility"
+            value={chamaVisibility}
+            onChange={(e) => setChamaVisibility(e.target.value)}
+          >
+            <option value="Public">Public</option>
+            <option value="Private">Private</option>
+          </select>
+        </div>
+        <div>
+          <label htmlFor="minimumMembers">Minimum Members:</label>
+          <input
+            type="number"
+            id="minimumMembers"
+            value={minimumMembers}
+            onChange={(e) => setMinimumMembers(e.target.value)}
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="targetAmount">Target Amount per Round (ETH):</label>
+          <input
+            type="number"
+            id="targetAmount"
+            value={targetAmount}
+            onChange={(e) => setTargetAmount(e.target.value)}
+            required
+          />
+        </div>
+        <button type="submit">Create Chama</button>
+      </form>
+    </div>
+  );
 
-//         <Form.Group controlId="formMaxNoOfPeople">
-//           <Form.Label>Maximum Number of People</Form.Label>
-//           <Form.Control
-//             type="number"
-//             placeholder="Enter maximum number of people"
-//             value={maxNoOfPeople}
-//             onChange={(e) => setMaxNoOfPeople(e.target.value)}
-//             required
-//           />
-//         </Form.Group>
-
-//         <Form.Group controlId="formVisibility">
-//           <Form.Label>Visibility</Form.Label>
-//           <Form.Control
-//             as="select"
-//             value={visibility}
-//             onChange={(e) => setVisibility(e.target.value)}
-//           >
-//             <option value="public">Public</option>
-//             <option value="private">Private</option>
-//           </Form.Control>
-//         </Form.Group>
-
-//         <Form.Group controlId="formMinimumNoOfPeople">
-//           <Form.Label>Minimum Number of People</Form.Label>
-//           <Form.Control
-//             type="number"
-//             placeholder="Enter minimum number of people"
-//             value={minimumNoOfPeople}
-//             onChange={(e) => setMinimumNoOfPeople(e.target.value)}
-//             required
-//           />
-//         </Form.Group>
-
-//         <Form.Group controlId="formTargetAmountPerRound">
-//           <Form.Label>Target Amount Per Round (in ETH)</Form.Label>
-//           <Form.Control
-//             type="number"
-//             step="0.01"
-//             placeholder="Enter target amount per round"
-//             value={targetAmountPerRound}
-//             onChange={(e) => setTargetAmountPerRound(e.target.value)}
-//             required
-//           />
-//         </Form.Group>
-
-//         <Button variant="primary" type="submit">
-//           Create Chama
-//         </Button>
-//       </Form>
-//     </Container>
-//   );
-// };
-
-// export default ChamaForm;
+  // ... (rest of the component code)
+};

@@ -52,6 +52,36 @@ export const connectUser = async (
 export const disconnectWallet = (setWalletAddress) => {
   setWalletAddress(null);
 };
+export const connectToContract = async () => {
+    try {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+      const contract = new ethers.Contract(ContractAddress, ContractAbi, signer);
+      return contract;
+    } catch (error) {
+      console.error('Error connecting to contract:', error);
+      throw error;
+    }
+};
+
+export const createChama = async (chamaName, maxMembers, chamaVisibility, minimumMembers, targetAmount) => {
+    try {
+      const contract = await connectToContract();
+      const visibilityValue = chamaVisibility === 'Public' ? 0 : 1;
+      const tx = await contract.create_chama(
+        chamaName,
+        maxMembers,
+        visibilityValue,
+        minimumMembers,
+        ethers.utils.parseEther(targetAmount)
+      );
+      await tx.wait();
+      console.log('Chama created successfully!');
+    } catch (error) {
+      console.error('Error creating chama:', error);
+      throw error;
+    }
+  };
 
 
 // export const CreateChamas=async(_name,_purpose,_maxNoPeople,_minDeposit,_visibility,setSuccessMessage)=>{
