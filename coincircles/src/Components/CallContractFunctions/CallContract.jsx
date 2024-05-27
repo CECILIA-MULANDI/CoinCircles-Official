@@ -6,10 +6,10 @@ export const connectUser = async (setWalletAddress, setIsConnected, setContract,
     if (window.ethereum) {
         try {
             await window.ethereum.request({ method: 'eth_requestAccounts' });
-            const provider = new ethers.BrowserProvider(window.ethereum);
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
             const accounts = await provider.listAccounts();
             setProvider(provider);
-            const contract =await new ethers.Contract(ContractAddress, ContractAbi.abi, provider.getSigner(accounts[0]));
+            const contract = await new ethers.Contract(ContractAddress, ContractAbi.abi, provider.getSigner(accounts[0]));
             setContract(contract);
             
             const connected = await contract.users(accounts[0]);
@@ -31,6 +31,9 @@ export const connectUser = async (setWalletAddress, setIsConnected, setContract,
         console.log('Please install MetaMask');
     }
 };
+
+// Other functions remain unchanged
+
 
 export const disconnectWallet = (setWalletAddress) => {
     setWalletAddress(null);
