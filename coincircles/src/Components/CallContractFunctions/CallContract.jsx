@@ -9,7 +9,7 @@ export const connectUser = async (setWalletAddress, setIsConnected, setContract,
             const provider = new ethers.providers.Web3Provider(window.ethereum);
             const accounts = await provider.listAccounts();
             setProvider(provider);
-            const contract = await new ethers.Contract(ContractAddress, ContractAbi.abi, provider.getSigner(accounts[0]));
+            const contract =await new ethers.Contract(ContractAddress, ContractAbi.abi, provider.getSigner(accounts[0]));
             setContract(contract);
             
             const connected = await contract.users(accounts[0]);
@@ -32,15 +32,12 @@ export const connectUser = async (setWalletAddress, setIsConnected, setContract,
     }
 };
 
-// Other functions remain unchanged
-
-
 export const disconnectWallet = (setWalletAddress) => {
     setWalletAddress(null);
 };
 
 export const CreateChamas = async (_name, _maxNoOfPeople, _visibility, _minimumNoOfPeople, _targetAmountPerRound, setSuccessMessage, setErrorMessage) => {
-    const provider = new ethers.BrowserProvider(window.ethereum);
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
     try {
         const signer = provider.getSigner();
         const contract = new ethers.Contract(ContractAddress, ContractAbi.abi, signer);
