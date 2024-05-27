@@ -1,6 +1,6 @@
 
 import ContractAbi from "../../artifacts/contracts/Lock.sol/CoinCircles.json"
-import ContractAddress  from "../Constants/Constants"
+import {ContractAddress } from "../Constants/Constants"
 import { ethers } from "ethers"
 
 export const connectUser=async(setWalletAddress,setIsConnected,setContract,setProvider,setError)=>{
