@@ -1,69 +1,78 @@
-import { ethers } from 'ethers';
-import ContractAbi from "../../artifacts/contracts/Lock.sol/CoinCircles.json";
-import { ContractAddress } from "../Constants/Constants";
 
-export const connectUser = async (setWalletAddress, setIsConnected, setContract, setProvider, setError) => {
-    if (window.ethereum) {
-        try {
-            await window.ethereum.request({ method: 'eth_requestAccounts' });
-            const provider = new ethers.providers.Web3Provider(window.ethereum);
-            const accounts = await provider.listAccounts();
-            setProvider(provider);
-            const contract =await new ethers.Contract(ContractAddress, ContractAbi.abi, provider.getSigner(accounts[0]));
+import ContractAbi from "../CallContractFunctions/CallContract"
+import { ContractAddress } from "../Constants/Constants"
+import { ethers } from "ethers"
+
+export const connectUser=async(setWalletAddress,setIsConnected,setContract,setProvider,setError)=>{
+    
+    if(window.ethereum){
+        try{
+            let accounts=await window.ethereum.request({method:'eth_requestAccounts'});
+            let web3provider=  new ethers.providers.Web3Provider(window.ethereum);
+        
+            setProvider(web3provider);
+            const contract= await new ethers.Contract(ContractAddress,ContractAbi.abi,web3provider.getSigner(accounts[0]));
             setContract(contract);
             
-            const connected = await contract.users(accounts[0]);
-            if (connected.isConnected) {
-                setIsConnected(true);
+            // CHECK IF USER IS CONNECTED **
+            const connected=await contract.users(accounts[0]);
+            console.log(connected)
+            if(connected.isConnected){
+                setIsConnected(true)
                 setWalletAddress(accounts[0]);
-            } else {
+             
+    
+            }else{
                 const tx = await contract.connect_user();
                 await tx.wait();
                 setWalletAddress(accounts[0]);
                 setIsConnected(true);
+        
             }
-        } catch (err) {
+            
+            // setError(null);
+
+        }catch(err){
+            // throw new Error('Error Connecting to wallet')
             setError('Error connecting to wallet');
-            console.error(err);
+            // console.error(err);
+            console.log(err)
+
         }
-    } else {
-        setError('Please install MetaMask');
-        console.log('Please install MetaMask');
+        }
+    else{
+        setError('Please install Metamask');
+        console.log('Please install Metamask')
     }
-};
 
-export const disconnectWallet = (setWalletAddress) => {
-    setWalletAddress(null);
-};
+}
+export const disconnectWallet=(setWalletAddress)=>{
+    setWalletAddress(null)
+}
 
-export const CreateChamas = async (_name, _maxNoOfPeople, _visibility, _minimumNoOfPeople, _targetAmountPerRound, setSuccessMessage, setErrorMessage) => {
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    try {
-        const signer = provider.getSigner();
-        const contract = new ethers.Contract(ContractAddress, ContractAbi.abi, signer);
-        const tx = await contract.create_chama(_name, _maxNoOfPeople, _visibility, _minimumNoOfPeople, _targetAmountPerRound);
-        await tx.wait();
-        setSuccessMessage(`Chama ${_name} created successfully`);
-    } catch (error) {
-        console.error(error);
-        setErrorMessage('Error creating chama. Please try again.');
+export const CreateChamas=async(_name,_purpose,_maxNoPeople,_minDeposit,_visibility,setSuccessMessage)=>{
+    // get provider
+    const provider=new ethers.providers.Web3Provider(window.ethereum);
+    let signer=provider.getSigner();
+// create an instance of the contract
+    let contract = new ethers.Contract(ContractAddress,ContractAbi.abi,signer);
+    console.log(signer);
+    try{
+
+        const tx=await contract.create_chama(_name,_purpose,_maxNoPeople,_minDeposit,_visibility);
+        tx.wait();
+        // listen to events
+        contract.once('ChamaCreated',(chamaId,name)=>{
+            setSuccessMessage(`Chama ${name} created successfully with ID ${chamaId}`);
+
+        })
+        console.log('Chama created successfully');
+    }catch(e){
+        console.log(e)
+        
     }
-};
+    
+ 
+   
 
-// Functions for join, contribute, vote, and get all chamas remain the same
-
-export const joinChama = async (_name, setSuccessMessage, setErrorMessage) => {
-    // Same as before
-};
-
-export const contributeFunds = async (_name, _amount, setSuccessMessage, setErrorMessage) => {
-    // Same as before
-};
-
-export const voteForRecipient = async (_name, _recipient, setSuccessMessage, setErrorMessage) => {
-    // Same as before
-};
-
-export const getAllChamas = async (setChamas, setErrorMessage) => {
-    // Same as before
-};
+}
