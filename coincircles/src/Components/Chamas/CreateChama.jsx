@@ -22,7 +22,7 @@ const ChamaForm = () => {
       const targetAmount = parseFloat(targetAmountPerRound);
   
       // Call CreateChamas function with the correct parameters
-      const {  chamaName } = await CreateChamas(
+      await CreateChamas(
         name,
         maxPeople,
         visibility,
@@ -30,7 +30,7 @@ const ChamaForm = () => {
         targetAmount
       );
   
-      setSuccessMessage(`Chama ${chamaName} created successfully`);
+      setSuccessMessage("Chama created successfully");
       setErrorMessage('');
     } catch (err) {
       setErrorMessage('Error creating chama. Please try again.');
