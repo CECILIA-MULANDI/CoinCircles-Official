@@ -14,7 +14,22 @@ const ChamaForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const { chamaId, chamaName } = await CreateChamas(name, maxNoOfPeople, visibility, minimumNoOfPeople, targetAmountPerRound);
+      // Convert maxNoOfPeople and minimumNoOfPeople to integers
+      const maxPeople = parseInt(maxNoOfPeople);
+      const minDeposit = parseInt(minimumNoOfPeople);
+  
+      // Ensure targetAmountPerRound is converted to a float
+      const targetAmount = parseFloat(targetAmountPerRound);
+  
+      // Call CreateChamas function with the correct parameters
+      const { chamaId, chamaName } = await CreateChamas(
+        name,
+        maxPeople,
+        visibility,
+        minDeposit,
+        targetAmount
+      );
+  
       setSuccessMessage(`Chama ${chamaName} created successfully with ID ${chamaId}`);
       setErrorMessage('');
     } catch (err) {
@@ -22,6 +37,7 @@ const ChamaForm = () => {
       console.error(err);
     }
   };
+  
 
   return (
     <Container>
