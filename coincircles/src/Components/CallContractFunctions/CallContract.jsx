@@ -70,7 +70,7 @@ export const CreateChamas = async (_name, _maxNoOfPeople, _visibility, _minimumN
         setErrorMessage('Error creating chama. Transaction failed.');
       }
     } catch (error) {
-      console.error(error);
+      console.log(error);
       setErrorMessage('Error creating chama. Please try again.');
     }
   };
