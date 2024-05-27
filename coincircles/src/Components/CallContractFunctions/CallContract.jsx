@@ -36,7 +36,7 @@ export const disconnectWallet = (setWalletAddress) => {
 };
 
 export const CreateChamas = async (_name, _maxNoOfPeople, _visibility, _minimumNoOfPeople, _targetAmountPerRound, setSuccessMessage, setErrorMessage) => {
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const provider = new ethers.BrowserProvider(window.ethereum);
     try {
         const signer = provider.getSigner();
         const contract = new ethers.Contract(ContractAddress, ContractAbi.abi, signer);
