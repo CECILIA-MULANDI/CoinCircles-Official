@@ -1,5 +1,5 @@
 
-import ContractAbi from "../CallContractFunctions/CallContract"
+import ContractAbi from "../../artifacts/contracts/Lock.sol/CoinCircles.json"
 import { ContractAddress } from "../Constants/Constants"
 import { ethers } from "ethers"
 
