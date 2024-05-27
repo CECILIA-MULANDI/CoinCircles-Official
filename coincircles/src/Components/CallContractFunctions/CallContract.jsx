@@ -1,6 +1,6 @@
 
 import ContractAbi from "../../artifacts/contracts/Lock.sol/CoinCircles.json"
-import { ContractAddress } from "../Constants/Constants"
+import ContractAddress  from "../Constants/Constants"
 import { ethers } from "ethers"
 
 export const connectUser=async(setWalletAddress,setIsConnected,setContract,setProvider,setError)=>{
@@ -51,29 +51,29 @@ export const disconnectWallet=(setWalletAddress)=>{
     setWalletAddress(null)
 }
 
-export const CreateChamas=async(_name,_purpose,_maxNoPeople,_minDeposit,_visibility,setSuccessMessage)=>{
-    // get provider
-    const provider=new ethers.providers.Web3Provider(window.ethereum);
-    let signer=provider.getSigner();
-// create an instance of the contract
-    let contract = new ethers.Contract(ContractAddress,ContractAbi.abi,signer);
-    console.log(signer);
-    try{
+// export const CreateChamas=async(_name,_purpose,_maxNoPeople,_minDeposit,_visibility,setSuccessMessage)=>{
+//     // get provider
+//     const provider=new ethers.providers.Web3Provider(window.ethereum);
+//     let signer=provider.getSigner();
+// // create an instance of the contract
+//     let contract = new ethers.Contract(ContractAddress,ContractAbi.abi,signer);
+//     console.log(signer);
+//     try{
 
-        const tx=await contract.create_chama(_name,_purpose,_maxNoPeople,_minDeposit,_visibility);
-        tx.wait();
-        // listen to events
-        contract.once('ChamaCreated',(chamaId,name)=>{
-            setSuccessMessage(`Chama ${name} created successfully with ID ${chamaId}`);
+//         const tx=await contract.create_chama(_name,_purpose,_maxNoPeople,_minDeposit,_visibility);
+//         tx.wait();
+//         // listen to events
+//         contract.once('ChamaCreated',(chamaId,name)=>{
+//             setSuccessMessage(`Chama ${name} created successfully with ID ${chamaId}`);
 
-        })
-        console.log('Chama created successfully');
-    }catch(e){
-        console.log(e)
+//         })
+//         console.log('Chama created successfully');
+//     }catch(e){
+//         console.log(e)
         
-    }
+//     }
     
  
    
 
-}
+// }

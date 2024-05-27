@@ -1,10 +1,10 @@
 // import { ethers } from 'ethers';
-import {  useState } from 'react';
+import {  useState,useEffect } from 'react';
 import Button from "react-bootstrap/Button";
-// import { ContractAddress } from '../../constants/constants';
-// import ContractAbi from "../../artifacts/contracts/hello.sol/CoinCircles.json"
+import { ContractAddress } from "../Constants/Constants"
+import ContractAbi from "../../artifacts/contracts/Lock.sol/CoinCircles.json"
 import { connectUser } from '../CallContractFunctions/CallContract';
-
+import { ethers } from 'ethers';
 import { disconnectWallet } from '../CallContractFunctions/CallContract';
 export default function ConnectWallet() {
   const [walletAddress,setWalletAddress] = useState(null);
@@ -15,6 +15,27 @@ export default function ConnectWallet() {
   const [contract,setContract]=useState(null);
   
   const [isConnected, setIsConnected] = useState(false);
+  
+
+  useEffect(() => {
+    async function checkConnection() {
+      if (provider && walletAddress) {
+        try {
+          const contract = new ethers.Contract(ContractAddress, ContractAbi, provider);
+          const filter = contract.filters.UserConnected(walletAddress);
+          const events = await contract.queryFilter(filter);
+          if (events.length > 0) {
+            setIsConnected(true);
+          }
+        } catch (error) {
+          console.error('Error checking connection:', error);
+          setError('Error checking connection');
+        }
+      }
+    }
+
+    checkConnection();
+  }, [provider, walletAddress]);
 
 
 
