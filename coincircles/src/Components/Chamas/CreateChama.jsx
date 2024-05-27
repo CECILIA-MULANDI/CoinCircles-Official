@@ -13,13 +13,13 @@ const CreateChama = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     try {
       await createChama(chamaName, maxMembers, chamaVisibility, minimumMembers, targetAmount);
       setSuccessMessage('Chama created successfully!');
       resetForm();
     } catch (error) {
-      setErrorMessage(`Error creating chama: ${error.message}`);
+      setErrorMessage(error.message); // Display the custom error message
       setSuccessMessage('');
     }
   };

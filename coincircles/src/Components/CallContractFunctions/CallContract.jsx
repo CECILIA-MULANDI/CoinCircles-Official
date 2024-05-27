@@ -64,6 +64,8 @@ export const connectToContract = async () => {
     }
 };
 
+
+// Function to create a chama
 export const createChama = async (chamaName, maxMembers, chamaVisibility, minimumMembers, targetAmount) => {
     try {
       const contract = await connectToContract();
@@ -78,35 +80,18 @@ export const createChama = async (chamaName, maxMembers, chamaVisibility, minimu
       await tx.wait();
       console.log('Chama created successfully!');
     } catch (error) {
-      console.error('Error creating chama:', error);
-      throw error;
+      if (error.message.includes('A chama with this name already exists')) {
+        throw new Error('A chama with the provided name already exists. Please choose a different name.');
+      } else if (error.message.includes('User is not connected')) {
+        throw new Error('You must connect your wallet before creating a chama.');
+      } else if (error.message.includes('Chama should have at least two members')) {
+        throw new Error('The maximum number of members should be at least 2.');
+      } else if (error.message.includes('The length of the name should not be empty')) {
+        throw new Error('The chama name cannot be empty.');
+      } else {
+        console.error('Error creating chama:', error);
+        throw error;
+      }
     }
   };
 
-
-// export const CreateChamas=async(_name,_purpose,_maxNoPeople,_minDeposit,_visibility,setSuccessMessage)=>{
-//     // get provider
-//     const provider=new ethers.providers.Web3Provider(window.ethereum);
-//     let signer=provider.getSigner();
-// // create an instance of the contract
-//     let contract = new ethers.Contract(ContractAddress,ContractAbi.abi,signer);
-//     console.log(signer);
-//     try{
-
-//         const tx=await contract.create_chama(_name,_purpose,_maxNoPeople,_minDeposit,_visibility);
-//         tx.wait();
-//         // listen to events
-//         contract.once('ChamaCreated',(chamaId,name)=>{
-//             setSuccessMessage(`Chama ${name} created successfully with ID ${chamaId}`);
-
-//         })
-//         console.log('Chama created successfully');
-//     }catch(e){
-//         console.log(e)
-        
-//     }
-    
- 
-   
-
-// }
