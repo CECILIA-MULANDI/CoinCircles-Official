@@ -48,33 +48,33 @@ export const disconnectWallet = (setWalletAddress) => {
     setWalletAddress(null);
 };
 
-export const CreateChamas = async (_name, _purpose, _maxNoPeople, _minDeposit, _visibility, setSuccessMessage) => {
-    // Initialize web3
+export const CreateChamas = async (_name, _purpose, _maxNoPeople, _minDeposit, _visibility, setSuccessMessage, setErrorMessage) => {
     const web3 = new Web3(window.ethereum);
-    
-    try {
-        // Get the current user's account
-        const accounts = await web3.eth.getAccounts();
 
-        // Create an instance of the contract
+    try {
+        const accounts = await web3.eth.getAccounts();
         const contract = new web3.eth.Contract(ContractAbi.abi, ContractAddress);
 
-        // Send the transaction to create the chama
         const tx = await contract.methods.create_chama(_name, _purpose, _maxNoPeople, _minDeposit, _visibility).send({ from: accounts[0] });
-        
-        // Wait for the transaction to be mined
-        await tx.wait();
 
-        // Listen for the 'ChamaCreated' event
-        contract.once('ChamaCreated', (chamaId, name) => {
-            setSuccessMessage(`Chama ${name} created successfully with ID ${chamaId}`);
-        });
+        // Wait for transaction confirmation
+        const receipt = await tx.wait();
 
-        console.log('Chama created successfully');
-    } catch (e) {
-        console.error(e);
+        if (receipt.status) {
+            // Transaction successful, handle success
+            const chamaId = receipt.events.ChamaCreated.returnValues.chamaId;
+            const chamaName = receipt.events.ChamaCreated.returnValues.name;
+            setSuccessMessage(`Chama ${chamaName} created successfully with ID ${chamaId}`);
+        } else {
+            // Transaction failed, handle error
+            setErrorMessage('Error creating chama. Transaction failed.');
+        }
+    } catch (error) {
+        console.error(error);
+        setErrorMessage('Error creating chama. Please try again.');
     }
 };
+
 
 // Function to join a Chama
 export const joinChama = async (_name, setSuccessMessage, setErrorMessage) => {
