@@ -48,32 +48,34 @@ export const disconnectWallet = (setWalletAddress) => {
     setWalletAddress(null);
 };
 
-export const CreateChamas = async (_name, _maxNoOfPeople, _visibility, _minimumNoOfPeople, _targetAmountPerRound) => {
+export const CreateChamas = async (_name, _purpose, _maxNoPeople, _minDeposit, _visibility, setSuccessMessage) => {
+    // Initialize web3
     const web3 = new Web3(window.ethereum);
-    const accounts = await web3.eth.getAccounts();
-    const contract = new web3.eth.Contract(ContractAbi.abi, ContractAddress);
-  
-    return new Promise((resolve, reject) => {
-      contract.methods
-        .create_chama(_name, _maxNoOfPeople, _visibility, _minimumNoOfPeople, _targetAmountPerRound)
-        .send({ from: accounts[0] })
-        .on('error', (error) => {
-          reject(error);
-        })
-        .on('transactionHash', (transactionHash) => {
-          console.log('Transaction Hash:', transactionHash);
-        })
-        .on('receipt', (receipt) => {
-          console.log('Receipt:', receipt);
-        })
-        .on('confirmation', (confirmationNumber, receipt) => {
-          console.log('Confirmation Number:', confirmationNumber);
-        })
-        .on('ChamaCreated', (chamaId, name) => {
-          resolve({ chamaId, name });
+    
+    try {
+        // Get the current user's account
+        const accounts = await web3.eth.getAccounts();
+
+        // Create an instance of the contract
+        const contract = new web3.eth.Contract(ContractAbi.abi, ContractAddress);
+
+        // Send the transaction to create the chama
+        const tx = await contract.methods.create_chama(_name, _purpose, _maxNoPeople, _minDeposit, _visibility).send({ from: accounts[0] });
+        
+        // Wait for the transaction to be mined
+        await tx.wait();
+
+        // Listen for the 'ChamaCreated' event
+        contract.once('ChamaCreated', (chamaId, name) => {
+            setSuccessMessage(`Chama ${name} created successfully with ID ${chamaId}`);
         });
-    });
-  };
+
+        console.log('Chama created successfully');
+    } catch (e) {
+        console.error(e);
+    }
+};
+
 // Function to join a Chama
 export const joinChama = async (_name, setSuccessMessage, setErrorMessage) => {
     const web3 = new Web3(window.ethereum);
