@@ -16,15 +16,14 @@ export default function ConnectWallet() {
   
   const [isConnected, setIsConnected] = useState(false);
   
-
   useEffect(() => {
     async function checkConnection() {
       if (provider && walletAddress) {
         try {
           const contract = new ethers.Contract(ContractAddress, ContractAbi, provider);
-          const filter = contract.filters.UserConnected(walletAddress);
-          const events = await contract.queryFilter(filter);
-          if (events.length > 0) {
+          const events = await contract.queryFilter(contract.filters.UserConnected());
+          const userEvents = events.filter(event => event.args.wallet_address === walletAddress);
+          if (userEvents.length > 0) {
             setIsConnected(true);
           }
         } catch (error) {
@@ -33,10 +32,8 @@ export default function ConnectWallet() {
         }
       }
     }
-
     checkConnection();
   }, [provider, walletAddress]);
-
 
 
  
