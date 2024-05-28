@@ -23,8 +23,10 @@ const ChamaList = () => {
           const address = await signer.getAddress();
           setUserAddress(address);
         } catch (error) {
+          console.log("error")
           setError(error.message);
         } finally {
+          console.log("Loading....")
           setLoading(false);
         }
       };
