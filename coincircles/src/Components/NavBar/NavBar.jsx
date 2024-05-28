@@ -2,6 +2,7 @@ import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import Container from 'react-bootstrap/Container';
 import ConnectWallet from '../ConnectWallet/Connect';
+import '../../App.css'
 function NavBar() {
     // const handleSelect = (eventKey) => alert(`selected ${eventKeys
   
