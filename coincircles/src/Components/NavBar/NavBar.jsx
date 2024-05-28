@@ -38,7 +38,7 @@ function NavBar() {
               </Nav.Item>
             </Nav>
             <Nav>
-              <Nav.Item>
+              <Nav.Item href='/availableChamas'>
                 <ConnectWallet />
               </Nav.Item>
             </Nav>
