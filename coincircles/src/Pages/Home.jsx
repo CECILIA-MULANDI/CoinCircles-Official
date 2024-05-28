@@ -1,15 +1,11 @@
 import React from 'react'
-import ConnectWallet from '../Components/ConnectWallet/Connect'
-import CreateChama from '../Components/Chamas/CreateChama'
-import ChamaList from '../Components/Chamas/ChamaList'
+import NavBar from '../Components/NavBar/NavBar'
 
 
 export default function Home() {
   return (
     <>
-    <ConnectWallet/>
- <CreateChama/>
- <ChamaList/>
+   <NavBar/>
     </>
     
   )
