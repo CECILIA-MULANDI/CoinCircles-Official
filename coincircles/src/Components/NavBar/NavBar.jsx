@@ -3,7 +3,7 @@ import Navbar from 'react-bootstrap/Navbar';
 import Container from 'react-bootstrap/Container';
 import ConnectWallet from '../ConnectWallet/Connect';
 function NavBar() {
-    const handleSelect = (eventKey) => alert(`selected ${eventKey}`);
+    // const handleSelect = (eventKey) => alert(`selected ${eventKeys
   
     return (
       <Navbar  expand="lg">
@@ -19,9 +19,9 @@ function NavBar() {
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
-            <Nav className="me-auto" variant="pills" activeKey="1" onSelect={handleSelect}>
+            <Nav className="ms-3 me-auto" variant="pills" >
               <Nav.Item>
-                <Nav.Link eventKey="1" href="/">
+                <Nav.Link  href="/">
                   Home
                 </Nav.Link>
               </Nav.Item>
