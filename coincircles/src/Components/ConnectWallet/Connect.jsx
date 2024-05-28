@@ -1,5 +1,4 @@
-// import { ethers } from 'ethers';
-import {  useState,useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Button from "react-bootstrap/Button";
 import { useNavigate } from 'react-router-dom';
 import { ContractAddress } from "../Constants/Constants";
@@ -7,16 +6,13 @@ import ContractAbi from "../../artifacts/contracts/Lock.sol/CoinCircles.json";
 import { connectUser } from '../CallContractFunctions/CallContract';
 import { ethers } from 'ethers';
 import { disconnectWallet } from '../CallContractFunctions/CallContract';
+
 export default function ConnectWallet() {
-  const [walletAddress,setWalletAddress] = useState(null);
+  const [walletAddress, setWalletAddress] = useState(null);
   const [error, setError] = useState(null);
-  
-  const [provider,setProvider]=useState(null);
-  // eslint-disable-next-line no-unused-vars
-  const [contract,setContract]=useState(null);
-  
-  const [isConnected, setIsConnected] = useState(false);
+  const [provider, setProvider] = useState(null);
   const navigate = useNavigate();
+
   useEffect(() => {
     async function checkConnection() {
       if (provider && walletAddress) {
@@ -25,7 +21,7 @@ export default function ConnectWallet() {
           const events = await contract.queryFilter(contract.filters.UserConnected());
           const userEvents = events.filter(event => event.args.wallet_address === walletAddress);
           if (userEvents.length > 0) {
-            setIsConnected(true);
+            // If user is connected, navigate to available chamas
             navigate('/availableChamas');
           }
         } catch (error) {
@@ -35,26 +31,19 @@ export default function ConnectWallet() {
       }
     }
     checkConnection();
-  }, [provider, walletAddress]);
-
-
- 
+  }, [provider, walletAddress, navigate]);
 
   return (
     <>
-  {walletAddress ? (
-      <>
-        <h3>Address: {walletAddress.substring(0, 5)}</h3>
-        {isConnected ? (
-          <Button className="connect-btn" onClick={()=>disconnectWallet(setWalletAddress)}>Disconnect</Button>
-        ) : (
-          <Button className="connect-btn" onClick={() => connectUser(setWalletAddress, setIsConnected, setContract, setProvider,setError)} >Connect</Button>
-        )}
-      </>
-    ) : (
-      <Button className="connect-btn" onClick={() => connectUser(setWalletAddress, setIsConnected, setContract, setProvider,setError)}>Connect</Button>
-    )}
-    {error && <p>{error}</p>}
+      {walletAddress ? (
+        <>
+          <h3>Address: {walletAddress.substring(0, 5)}</h3>
+          <Button className="connect-btn" onClick={() => disconnectWallet(setWalletAddress)}>Disconnect</Button>
+        </>
+      ) : (
+        <Button className="connect-btn" onClick={() => connectUser(setWalletAddress, setProvider, setError)}>Connect</Button>
+      )}
+      {error && <p>{error}</p>}
     </>
   );
 }
