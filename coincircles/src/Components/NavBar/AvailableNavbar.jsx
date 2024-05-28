@@ -1,6 +1,6 @@
 import React, { useState,useEffect } from 'react';
 import { Nav, Navbar, Container, Button } from 'react-bootstrap';
-import { Link, useHistory } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import ConnectWallet from '../ConnectWallet/Connect';
 import { ethers } from 'ethers';
 import './NavBar.css';
@@ -8,7 +8,7 @@ import './NavBar.css';
 function AvailableNavBar() {
     const [isConnected, setIsConnected] = useState(false);
     const [userAddress, setUserAddress] = useState(null);
-    const history = useHistory();
+    const history = Navigate();
 
     useEffect(() => {
         const checkConnection = async () => {
