@@ -6,7 +6,7 @@ function NavBar() {
     const handleSelect = (eventKey) => alert(`selected ${eventKey}`);
   
     return (
-      <Navbar bg="light" expand="lg">
+      <Navbar  expand="lg">
         <Container>
           <Navbar.Brand href="/">
             <img
@@ -19,7 +19,7 @@ function NavBar() {
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
-            <Nav className="mx-auto" variant="pills" activeKey="1" onSelect={handleSelect}>
+            <Nav className="me-auto" variant="pills" activeKey="1" onSelect={handleSelect}>
               <Nav.Item>
                 <Nav.Link eventKey="1" href="/">
                   Home
