@@ -2,52 +2,33 @@ import ContractAbi from "../../artifacts/contracts/Lock.sol/CoinCircles.json";
 import { ContractAddress } from "../Constants/Constants";
 import { ethers } from "ethers";
 
-export const connectUser = async (
-  setWalletAddress,
-  setIsConnected,
-  setContract,
-  setProvider,
-  setError
-) => {
-  if (window.ethereum) {
-    try {
-      let accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
-      console.log("Connected account:", accounts[0]);
 
-      let web3provider = await new ethers.providers.Web3Provider(window.ethereum);
-      setProvider(web3provider);
 
-      const contract = await new ethers.Contract(
-        ContractAddress,
-        ContractAbi,
-        web3provider.getSigner(accounts[0])
-      );
-      setContract(contract);
-
-      // CHECK IF USER IS CONNECTED
-      const userDetails = await contract.users(accounts[0]);
-      console.log("User details:", userDetails);
-
-      if (userDetails.isConnected) {
-        console.log("User is already connected");
-        setIsConnected(true);
-        setWalletAddress(accounts[0]);
-      } else {
-        // User is not connected, proceed with connection
-        const tx = await contract.connect_user();
-        await tx.wait();
-        setWalletAddress(accounts[0]);
-        setIsConnected(true);
-      }
-    } catch (err) {
-      console.error("Error connecting to wallet:", err);
-      setError(`Error connecting to wallet: ${err.reason || err.message}`);
+async function connectUser(setWalletAddress, setProvider, setError) {
+  try {
+    // Check if MetaMask is installed
+    if (typeof window.ethereum !== 'undefined') {
+      // Request account access if needed
+      await window.ethereum.request({ method: 'eth_requestAccounts' });
+      
+      // Get the provider
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      setProvider(provider);
+      
+      // Get the user's address
+      const accounts = await provider.listAccounts();
+      const walletAddress = accounts[0];
+      setWalletAddress(walletAddress);
+    } else {
+      throw new Error('MetaMask extension not detected');
     }
-  } else {
-    setError("Please install Metamask");
-    console.log("Please install Metamask");
+  } catch (error) {
+    console.error('Error connecting to wallet:', error);
+    setError('Error connecting to wallet');
   }
-};
+}
+
+export { connectUser };
 
 export const disconnectWallet = (setWalletAddress) => {
   setWalletAddress(null);
