@@ -1,6 +1,7 @@
 // import { ethers } from 'ethers';
 import {  useState,useEffect } from 'react';
 import Button from "react-bootstrap/Button";
+import { useNavigate } from 'react-router-dom';
 import { ContractAddress } from "../Constants/Constants";
 import ContractAbi from "../../artifacts/contracts/Lock.sol/CoinCircles.json";
 import { connectUser } from '../CallContractFunctions/CallContract';
@@ -15,7 +16,7 @@ export default function ConnectWallet() {
   const [contract,setContract]=useState(null);
   
   const [isConnected, setIsConnected] = useState(false);
-  
+  const navigate = useNavigate();
   useEffect(() => {
     async function checkConnection() {
       if (provider && walletAddress) {
@@ -25,6 +26,7 @@ export default function ConnectWallet() {
           const userEvents = events.filter(event => event.args.wallet_address === walletAddress);
           if (userEvents.length > 0) {
             setIsConnected(true);
+            navigate('/availableChamas');
           }
         } catch (error) {
           console.error('Error checking connection:', error);
