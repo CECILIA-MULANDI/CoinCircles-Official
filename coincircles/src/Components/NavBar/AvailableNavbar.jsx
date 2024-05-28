@@ -1,10 +1,24 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Nav, Navbar, Container, Button } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import ConnectWallet from '../ConnectWallet/Connect';
 import './NavBar.css';
 
 function AvailableNavBar() {
+    const [isConnected, setIsConnected] = useState(false);
+    const history = useHistory();
+
+    const handleConnect = (address) => {
+        setIsConnected(true);
+        console.log('Connected:', address);
+    };
+
+    const handleDisconnect = () => {
+        setIsConnected(false);
+        console.log('Disconnected');
+        history.push('/');
+    };
+
     return (
         <Navbar className='custom-color' expand="lg">
             <Container>
@@ -32,13 +46,15 @@ function AvailableNavBar() {
                     </Nav>
                     <Nav>
                         <Nav.Item>
-                            <ConnectWallet />
+                            <ConnectWallet onConnect={handleConnect} onDisconnect={handleDisconnect} />
                         </Nav.Item>
-                        <Nav.Item>
-                            <Button as={Link} to="/createChama" variant="primary" style={{ marginLeft: '10px' }}>
-                                Create Chama
-                            </Button>
-                        </Nav.Item>
+                        {isConnected && (
+                            <Nav.Item>
+                                <Button as={Link} to="/createChama" variant="primary" style={{ marginLeft: '10px' }}>
+                                    Create Chama
+                                </Button>
+                            </Nav.Item>
+                        )}
                     </Nav>
                 </Navbar.Collapse>
             </Container>
