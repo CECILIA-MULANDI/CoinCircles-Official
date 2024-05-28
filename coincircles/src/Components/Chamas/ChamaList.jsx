@@ -13,7 +13,9 @@ const ChamaList = () => {
     useEffect(() => {
       const fetchChamas = async () => {
         try {
+          console.log('Fetching chamas...');
           const chamaDetails = await getAllChamas();
+          console.log('Chamas fetched:', chamaDetails);
           setChamas(chamaDetails);
   
           const provider = new ethers.providers.Web3Provider(window.ethereum);
