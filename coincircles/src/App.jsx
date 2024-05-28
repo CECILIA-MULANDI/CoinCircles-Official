@@ -10,7 +10,7 @@ function App() {
     <Routes>
       <Route path='/' element={<Home/>}/>
       <Route path='/availableChamas' element={<ChamaList/>}/>
-      <Route path="/createChama" component={CreateChama} />
+      <Route path="/createChama" element={CreateChama} />
       
     </Routes>           
     </BrowserRouter>
