@@ -116,7 +116,7 @@ const ChamaList = () => {
 
 const styles = {
     page: {
-        backgroundColor: 'blue',
+        backgroundColor: '#0a253b',
         padding: '20px',
     },
     heading: {
@@ -133,9 +133,9 @@ const styles = {
         backgroundColor: 'white',
         color: 'black',
         padding: '20px',
-        borderRadius: '10px',
+        borderRadius: '20px',
         boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-        width: '300px',
+        width: '400px',
     },
     button: {
         backgroundColor: '#1fc1c3',
