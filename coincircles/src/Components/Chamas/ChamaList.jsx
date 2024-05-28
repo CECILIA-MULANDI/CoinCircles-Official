@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getAllChamas, addMemberToPrivateChama, joinChama, contributeFunds } from '../CallContractFunctions/CallContract';
 import { ethers } from 'ethers';
+import AvailableNavBar from '../NavBar/AvailableNavbar';
 
 const ChamaList = () => {
     const [chamas, setChamas] = useState([]);
@@ -72,6 +73,8 @@ const ChamaList = () => {
     }
 
     return (
+      <>
+      <AvailableNavBar/>
         <div style={styles.page}>
             <h2 style={styles.heading}>Available Chamas</h2>
             {chamas.length === 0 ? (
@@ -111,6 +114,7 @@ const ChamaList = () => {
                 </div>
             )}
         </div>
+        </>
     );
 };
 
