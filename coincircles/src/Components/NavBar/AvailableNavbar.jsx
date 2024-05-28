@@ -1,21 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { Nav, Navbar, Container, Button } from 'react-bootstrap';
 import { Link, useHistory } from 'react-router-dom';
 import ConnectWallet from '../ConnectWallet/Connect';
+import { ethers } from 'ethers';
 import './NavBar.css';
 
 function AvailableNavBar() {
     const [isConnected, setIsConnected] = useState(false);
+    const [userAddress, setUserAddress] = useState(null);
     const history = useHistory();
+
+    useEffect(() => {
+        const checkConnection = async () => {
+            if (window.ethereum) {
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                const accounts = await provider.listAccounts();
+                if (accounts.length > 0) {
+                    setIsConnected(true);
+                    setUserAddress(accounts[0]);
+                }
+            }
+        };
+
+        checkConnection();
+    }, []);
 
     const handleConnect = (address) => {
         setIsConnected(true);
-        console.log('Connected:', address);
+        setUserAddress(address);
     };
 
     const handleDisconnect = () => {
         setIsConnected(false);
-        console.log('Disconnected');
+        setUserAddress(null);
         history.push('/');
     };
 
@@ -46,7 +63,12 @@ function AvailableNavBar() {
                     </Nav>
                     <Nav>
                         <Nav.Item>
-                            <ConnectWallet onConnect={handleConnect} onDisconnect={handleDisconnect} />
+                            <ConnectWallet
+                                isConnected={isConnected}
+                                address={userAddress}
+                                onConnect={handleConnect}
+                                onDisconnect={handleDisconnect}
+                            />
                         </Nav.Item>
                         {isConnected && (
                             <Nav.Item>
