@@ -1,6 +1,7 @@
 
 import Home from "./Pages/Home/Home";
 import ChamaList from "./Components/Chamas/ChamaList";
+import CreateChama from "./Components/Chamas/CreateChama";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import './index.css';
 function App() {
@@ -8,8 +9,8 @@ function App() {
     <BrowserRouter>
     <Routes>
       <Route path='/' element={<Home/>}/>
-    
       <Route path='/availableChamas' element={<ChamaList/>}/>
+      <Route path="/createChama" component={CreateChama} />
       
     </Routes>           
     </BrowserRouter>
