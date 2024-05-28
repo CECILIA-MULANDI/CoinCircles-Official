@@ -1,41 +1,10 @@
-import React, { useState,useEffect } from 'react';
+import React from 'react';
 import { Nav, Navbar, Container, Button } from 'react-bootstrap';
-import { Link, Navigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import ConnectWallet from '../ConnectWallet/Connect';
-import { ethers } from 'ethers';
 import './NavBar.css';
 
 function AvailableNavBar() {
-    const [isConnected, setIsConnected] = useState(false);
-    const [userAddress, setUserAddress] = useState(null);
-    const history = Navigate();
-
-    useEffect(() => {
-        const checkConnection = async () => {
-            if (window.ethereum) {
-                const provider = new ethers.providers.Web3Provider(window.ethereum);
-                const accounts = await provider.listAccounts();
-                if (accounts.length > 0) {
-                    setIsConnected(true);
-                    setUserAddress(accounts[0]);
-                }
-            }
-        };
-
-        checkConnection();
-    }, []);
-
-    const handleConnect = (address) => {
-        setIsConnected(true);
-        setUserAddress(address);
-    };
-
-    const handleDisconnect = () => {
-        setIsConnected(false);
-        setUserAddress(null);
-        history.push('/');
-    };
-
     return (
         <Navbar className='custom-color' expand="lg">
             <Container>
@@ -63,20 +32,13 @@ function AvailableNavBar() {
                     </Nav>
                     <Nav>
                         <Nav.Item>
-                            <ConnectWallet
-                                isConnected={isConnected}
-                                address={userAddress}
-                                onConnect={handleConnect}
-                                onDisconnect={handleDisconnect}
-                            />
+                            <ConnectWallet />
                         </Nav.Item>
-                        {isConnected && (
-                            <Nav.Item>
-                                <Button as={Link} to="/createChama" variant="primary" style={{ marginLeft: '10px' }}>
-                                    Create Chama
-                                </Button>
-                            </Nav.Item>
-                        )}
+                        <Nav.Item>
+                            <Button as={Link} to="/createChama" variant="primary" style={{ marginLeft: '10px' }}>
+                                Create Chama
+                            </Button>
+                        </Nav.Item>
                     </Nav>
                 </Navbar.Collapse>
             </Container>
