@@ -131,6 +131,7 @@ const ChamaList = () => {
         }
     };
     
+    
 
     const isMember = (chama, userAddress) => {
         return chama.listOfMembers.includes(userAddress);
