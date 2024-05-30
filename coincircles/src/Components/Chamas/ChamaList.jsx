@@ -173,7 +173,9 @@ const ChamaList = () => {
                 return;
             }
     
-            // Create a Contract instance using the contract address and ABI
+            console.log("Selected Chama Address:", chamaAddress);
+            console.log("Contribution Amount in Ether:", amountInEther.toString());
+    
             const chamaContract = new ethers.Contract(chamaAddress, ContractAbi, signer);
     
             // Verify that the method exists in the contract
@@ -183,11 +185,10 @@ const ChamaList = () => {
                 return;
             }
     
-            // Call the contributeFunds method in the contract with the specified value
+            // Call the method
             const tx = await chamaContract[methodName]({ value: amountInEther });
             await tx.wait();
     
-            // Contribution successful, reset state and close modal
             console.log('Transaction successful:', tx);
             setContributionAmount('');
             setShowContributionModal(false);
@@ -196,6 +197,7 @@ const ChamaList = () => {
             setError(error.message);
         }
     };
+    
     
     
 
