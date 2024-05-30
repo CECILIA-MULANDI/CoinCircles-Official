@@ -106,17 +106,14 @@ const ChamaList = () => {
                 return;
             }
     
-            const chamaAddress = selectedChama.contractAddress;
-            if (!chamaAddress) {
-                setError('Chama contract address not found.');
-                return;
-            }
-    
-            console.log("Selected Chama Address:", chamaAddress);
+            const chamaId = await getChamaId(selectedChama.name);
+           
+            const chamaContract = new ethers.Contract(chamaId, ContractAbi, signer);
+            // console.log("Selected Chama Address:", chamaAddress);
             console.log("Contribution Amount in Ether:", amountInEther.toString());
     
             // Create an instance of the contract
-            const chamaContract = new ethers.Contract(chamaAddress, ContractAbi, signer);
+            // const chamaContract = new ethers.Contract(chamaAddress, ContractAbi, signer);
     
             // Call the appropriate function to make the contribution
             const tx = await chamaContract.contributeToChama({ value: amountInEther });
