@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getAllChamas, addMemberToPrivateChama, joinChama, contributeFunds, isMinimumNumberOfPeopleReached, getContributionAmount, getChamaId } from '../CallContractFunctions/CallContract';
+import { getAllChamas, addMemberToPrivateChama, joinChama, isMinimumNumberOfPeopleReached, getContributionAmount, getChamaId } from '../CallContractFunctions/CallContract';
 import { ethers } from 'ethers';
 import AvailableNavBar from '../NavBar/AvailableNavbar';
 
@@ -92,9 +92,8 @@ const ChamaList = () => {
             const signer = provider.getSigner();
 
             const amountInEther = ethers.utils.parseEther(contributionAmount);
-            const amountAsString = ethers.utils.formatEther(amountInEther);
 
-            if (amountAsString === '0.0') {
+            if (amountInEther.isZero()) {
                 setError('Contribution amount is too small');
                 return;
             }
@@ -104,16 +103,17 @@ const ChamaList = () => {
                 return;
             }
 
-            console.log("Selected Chama Name:", selectedChama.name);
-            console.log("Contribution Amount in Ether:", amountAsString);
+            const chamaAddress = await getChamaId(selectedChama.name); // Assuming this returns the contract address
+            console.log("Selected Chama Address:", chamaAddress);
+            console.log("Contribution Amount in Ether:", amountInEther.toString());
 
             const tx = {
-                to: selectedChama.address, // The address of the chama contract
-                value: amountInEther, // The amount to send in wei
+                to: chamaAddress,
+                value: amountInEther
             };
 
-            await signer.sendTransaction(tx);
-            console.log('Transaction successful');
+            const transaction = await signer.sendTransaction(tx);
+            console.log('Transaction successful:', transaction);
             setContributionAmount('');
             setShowContributionModal(false);
             // Optionally, you can refresh the chama list after contributing
@@ -238,6 +238,7 @@ const styles = {
         border: 'none',
         borderRadius: '5px',
         cursor: 'pointer',
+        margin: '5px',
     },
     modal: {
         position: 'fixed',
