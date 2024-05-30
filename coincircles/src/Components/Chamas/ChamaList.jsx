@@ -112,7 +112,7 @@ const ChamaList = () => {
             const chamaContract = new ethers.Contract(chamaAddress, ContractAbi, signer);
     
             // Verify that the method exists in the contract
-            const methodName = 'contributeToChama';
+            const methodName = 'contributeFunds';
             if (!chamaContract[methodName]) {
                 setError(`Method ${methodName} not found in the contract.`);
                 return;
