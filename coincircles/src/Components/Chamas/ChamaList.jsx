@@ -290,7 +290,7 @@ const ChamaList = () => {
                 Contribute Funds
             </button>
         )}
-        <button style={styles.button} onClick={() => handleSelectChama(chama)}>Select Chama</button>
+        <button style={styles.button} onClick={() => handleSelectChama(chama.name)}>Select Chama</button>
     </div>
 ))}
 
