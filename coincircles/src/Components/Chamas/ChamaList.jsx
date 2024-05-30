@@ -87,7 +87,7 @@ const ChamaList = () => {
                 return;
             }
 
-            // Verify chama.name and amountInEther before making the contract call
+            // Verify selectedChama.name and amountInEther before making the contract call
             console.log("Chama Name:", selectedChama.name);
             console.log("Amount in Ether:", amountInEther.toString());
 
@@ -156,6 +156,8 @@ const ChamaList = () => {
                                             Contribute Funds
                                         </button>
                                     )}
+                                    {/* Add onClick handler to select chama */}
+                                    <button style={styles.button} onClick={() => setSelectedChama(chama)}>Select Chama</button>
                                 </div>
                             ))}
                         </div>
@@ -171,71 +173,71 @@ const ChamaList = () => {
                             value={contributionAmount}
                             onChange={(e) => setContributionAmount(e.target.value)}
                             placeholder="Enter contribution amount"
-                        />
-                        <button style={styles.button} onClick={() => handleContribution()}>
-                            Contribute
-                        </button>
-                        <button style={styles.button} onClick={() => setShowContributionModal(false)}>
-                            Cancel
-                        </button>
+                            />
+                            <button style={styles.button} onClick={() => handleContribution()}>
+                                Contribute
+                            </button>
+                            <button style={styles.button} onClick={() => setShowContributionModal(false)}>
+                                Cancel
+                            </button>
+                        </div>
                     </div>
-                </div>
-            )}
-        </>
-    );
-};
-
-const styles = {
-    page: {
-        backgroundColor: '#0a253b',
-        padding: '20px',
-    },
-    heading: {
-        textAlign: 'center',
-        color: 'white',
-    },
-    cardContainer: {
-        display: 'flex',
-        flexWrap: 'wrap',
-        gap: '20px',
-        justifyContent: 'center',
-    },
-    card: {
-        backgroundColor: 'white',
-        color: 'black',
-        padding: '20px',
-        borderRadius: '20px',
-        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-        width: '400px',
-    },
-    button: {
-        backgroundColor: '#1fc1c3',
-        color: 'white',
-        padding: '10px',
-        border: 'none',
-        borderRadius: '5px',
-        cursor: 'pointer',
-    },
-    modal: {
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    modalContent: {
-        backgroundColor: 'white',
-        padding: '20px',
-        borderRadius: '5px',
-        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-        maxWidth: '400px',
-        textAlign: 'center',
-    },
-};
-
+                )}
+            </>
+        );
+    };
+    
+    const styles = {
+        page: {
+            backgroundColor: '#0a253b',
+            padding: '20px',
+        },
+        heading: {
+            textAlign: 'center',
+            color: 'white',
+        },
+        cardContainer: {
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '20px',
+            justifyContent: 'center',
+        },
+        card: {
+            backgroundColor: 'white',
+            color: 'black',
+            padding: '20px',
+            borderRadius: '20px',
+            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+            width: '400px',
+        },
+        button: {
+            backgroundColor: '#1fc1c3',
+            color: 'white',
+            padding: '10px',
+            border: 'none',
+            borderRadius: '5px',
+            cursor: 'pointer',
+        },
+        modal: {
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+        },
+        modalContent: {
+            backgroundColor: 'white',
+            padding: '20px',
+            borderRadius: '5px',
+            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+            maxWidth: '400px',
+            textAlign: 'center',
+        },
+    };
+    
 export default ChamaList;
-
+    
