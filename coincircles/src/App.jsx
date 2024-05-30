@@ -4,7 +4,7 @@ import ChamaList from "./Components/Chamas/ChamaList";
 import CreateChama from "./Components/Chamas/CreateChama";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import './index.css';
-import ProtectedRoute from './Components/ProtectedRoute ';
+import ProtectedRoute from './Components/ProtectedRoutes/ProtectedRoute';
 function App() {
   return (
     <BrowserRouter>
