@@ -16,24 +16,23 @@ const CreateChama = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    try {
-      const successMsg = await createChama(chamaName, maxMembers, chamaVisibility, minimumMembers, targetAmount);
-      setSuccessMessage(successMsg);
+    const result = await createChama(chamaName, maxMembers, chamaVisibility, minimumMembers, targetAmount);
+
+    if (result.success) {
+      setSuccessMessage(result.success);
+      setErrorMessage('');
       resetForm();
-      clearTimeout(messageTimeout);
-      const timeout = setTimeout(() => {
-        setSuccessMessage('');
-      }, 5000);
-      setMessageTimeout(timeout);
-    } catch (error) {
-      setErrorMessage(error.message);
+    } else if (result.error) {
+      setErrorMessage(result.error);
       setSuccessMessage('');
-      clearTimeout(messageTimeout);
-      const timeout = setTimeout(() => {
-        setErrorMessage('');
-      }, 5000);
-      setMessageTimeout(timeout);
     }
+
+    clearTimeout(messageTimeout);
+    const timeout = setTimeout(() => {
+      setErrorMessage('');
+      setSuccessMessage('');
+    }, 5000);
+    setMessageTimeout(timeout);
   };
 
   const resetForm = () => {
@@ -42,9 +41,6 @@ const CreateChama = () => {
     setChamaVisibility('Public');
     setMinimumMembers('');
     setTargetAmount('');
-    setErrorMessage('');
-    clearTimeout(messageTimeout);
-    setMessageTimeout(null);
   };
 
   return (

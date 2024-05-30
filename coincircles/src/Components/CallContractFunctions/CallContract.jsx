@@ -48,6 +48,8 @@ export const connectToContract = async () => {
 
 // Function to create a chama
  
+
+
 export const createChama = async (chamaName, maxMembers, chamaVisibility, minimumMembers, targetAmount) => {
   try {
     const contract = await connectToContract();
@@ -59,33 +61,33 @@ export const createChama = async (chamaName, maxMembers, chamaVisibility, minimu
       minimumMembers,
       ethers.utils.parseEther(targetAmount)
     );
-    
-    // Wait for the transaction to be mined
-    const receipt = await tx.wait();
 
-    // Listen for ChamaCreated event
+    const receipt = await tx.wait();
     const event = receipt.events.find(event => event.event === 'ChamaCreated');
     if (event) {
-      console.log(`Chama created successfully with ID: ${event.args[0].toNumber()} and Name: ${event.args[1]}`);
-      return `Chama "${event.args[1]}" created successfully with ID: ${event.args[0].toNumber()}!`;
+      return { success: `Chama "${event.args[1]}" created successfully with ID: ${event.args[0].toNumber()}!` };
     } else {
       throw new Error('Chama creation event not found. Please check the transaction status.');
     }
   } catch (error) {
+    let errorMessage;
     if (error.message.includes('A chama with this name already exists')) {
-      throw new Error('A chama with the provided name already exists. Please choose a different name.');
+      errorMessage = 'A chama with the provided name already exists. Please choose a different name.';
     } else if (error.message.includes('User is not connected')) {
-      throw new Error('You must connect your wallet before creating a chama.');
+      errorMessage = 'You must connect your wallet before creating a chama.';
     } else if (error.message.includes('Chama should have at least two members')) {
-      throw new Error('The maximum number of members should be at least 2.');
+      errorMessage = 'The maximum number of members should be at least 2.';
     } else if (error.message.includes('The length of the name should not be empty')) {
-      throw new Error('The chama name cannot be empty.');
+      errorMessage = 'The chama name cannot be empty.';
+    } else if (error.message.includes('Maximum number of people should be greater than or equal to the minimum')) {
+      errorMessage = 'Maximum number of people should be greater than or equal to the minimum.';
     } else {
-      console.error('Error creating chama:', error);
-      throw error;
+      errorMessage = 'An unexpected error occurred. Please try again later.';
     }
+    return { error: errorMessage };
   }
 };
+
 
 
 
