@@ -51,14 +51,20 @@ export default function ConnectWallet() {
       // Create an instance of the contract
       const contract = new ethers.Contract(ContractAddress, ContractAbi, signer);
   
-      // Call the connect_user function
-      const tx = await contract.connect_user();
-      await tx.wait();
+      // Check if the wallet address is already connected
+      const isConnected = await contract.users(address).isConnected;
   
-      setIsConnected(true);
+      if (!isConnected) {
+        // Call the connect_user function if not connected
+        const tx = await contract.connect_user();
+        await tx.wait();
+        setIsConnected(true);
+      } else {
+        setIsConnected(true);
+        console.log('User is already connected');
+      }
+  
       localStorage.setItem('walletAddress', address);
-  
-      console.log('Wallet connected successfully');
     } catch (error) {
       console.error('Error connecting wallet:', error);
       setError('Error connecting wallet');
