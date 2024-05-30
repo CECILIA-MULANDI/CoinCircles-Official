@@ -11,7 +11,9 @@ const ChamaList = () => {
     const [error, setError] = useState(null);
     const [userAddress, setUserAddress] = useState(null);
     const [isContributionStarted, setIsContributionStarted] = useState(false);
-    const [contributionAmount, setContributionAmount] = useState('');
+    // const [contributionAmount, setContributionAmount] = useState('');
+    const [contributionAmount, setContributionAmount] = useState('0');
+
     const [showContributionModal, setShowContributionModal] = useState(false);
     const [selectedChama, setSelectedChama] = useState(null);
     const handleSelectChama = (chama) => {
@@ -85,59 +87,29 @@ const ChamaList = () => {
     //         setError(error.message);
     //     }
     // };
-    const handleContributeFunds = async () => {
+    const handleContributeFunds = async (chamaName) => {
         try {
-            if (!window.ethereum) {
-                setError('Please install MetaMask or another Ethereum-compatible wallet.');
+            const selected = chamas.find(chama => chama.name === chamaName);
+            if (!selected) {
+                setError('Selected Chama does not exist.');
                 return;
             }
-    
-            await window.ethereum.request({ method: 'eth_requestAccounts' });
-    
-            const provider = new ethers.providers.Web3Provider(window.ethereum);
-            const signer = provider.getSigner();
-            const amountInEther = ethers.utils.parseEther(contributionAmount);
-    
-            if (amountInEther.isZero()) {
-                setError('Contribution amount is too small');
-                return;
+            
+            const isMinimumReached = await isMinimumNumberOfPeopleReached(chamaName);
+            if (isMinimumReached) {
+                setIsContributionStarted(true);
+                const contributionAmount = await getContributionAmount(chamaName);
+                setContributionAmount(ethers.utils.formatEther(contributionAmount));
+                setSelectedChama(selected); // Update selectedChama state
+                setShowContributionModal(true);
+            } else {
+                setError('Minimum number of members required for contributions has not been reached');
             }
-    
-            if (!selectedChama) {
-                setError('No chama selected.');
-                return;
-            }
-    
-            const chamaAddress = selectedChama.contractAddress;
-            if (!chamaAddress) {
-                setError('Chama contract address not found.');
-                return;
-            }
-    
-            console.log("Selected Chama Address:", chamaAddress);
-            console.log("Contribution Amount in Ether:", amountInEther.toString());
-    
-            const chamaContract = new ethers.Contract(chamaAddress, ContractAbi, signer);
-    
-            // Verify that the method exists in the contract
-            const methodName = 'contributeFunds';
-            if (!chamaContract[methodName]) {
-                setError(`Method ${methodName} not found in the contract.`);
-                return;
-            }
-    
-            // Call the method
-            const tx = await chamaContract[methodName]({ value: amountInEther });
-            await tx.wait();
-    
-            console.log('Transaction successful:', tx);
-            setContributionAmount('');
-            setShowContributionModal(false);
         } catch (error) {
-            console.error("Error during contribution:", error);
             setError(error.message);
         }
     };
+    
     const handleContribution = async () => {
         try {
             // Check if MetaMask or another Ethereum-compatible wallet is installed
