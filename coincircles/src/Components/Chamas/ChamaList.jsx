@@ -63,11 +63,18 @@ const ChamaList = () => {
 
     const handleContributeFunds = async (chamaName) => {
         try {
+            const selected = chamas.find(chama => chama.name === chamaName);
+            if (!selected) {
+                setError('Selected Chama does not exist.');
+                return;
+            }
+            
             const isMinimumReached = await isMinimumNumberOfPeopleReached(chamaName);
             if (isMinimumReached) {
                 setIsContributionStarted(true);
                 const contributionAmount = await getContributionAmount(chamaName);
                 setContributionAmount(ethers.utils.formatEther(contributionAmount));
+                setSelectedChama(selected); // Update selectedChama state
                 setShowContributionModal(true);
             } else {
                 setError('Minimum number of members required for contributions has not been reached');
@@ -76,6 +83,7 @@ const ChamaList = () => {
             setError(error.message);
         }
     };
+    
 
     const handleContribution = async () => {
         try {
