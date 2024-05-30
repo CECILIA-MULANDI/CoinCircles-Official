@@ -11,7 +11,7 @@ const ChamaList = () => {
     const [isContributionStarted, setIsContributionStarted] = useState(false);
     const [contributionAmount, setContributionAmount] = useState('');
     const [showContributionModal, setShowContributionModal] = useState(false);
-    const [selectedChama, setSelectedChama] = useState(null); // State to store the selected chama
+    const [selectedChama, setSelectedChama] = useState(null);
 
     useEffect(() => {
         const fetchChamas = async () => {
@@ -26,7 +26,7 @@ const ChamaList = () => {
                 const address = await signer.getAddress();
                 setUserAddress(address);
             } catch (error) {
-                console.log("error");
+                console.error("Error fetching chamas:", error); // Improved error logging
                 setError(error.message);
             } finally {
                 console.log("Loading....");
@@ -39,34 +39,44 @@ const ChamaList = () => {
 
     const handleJoinChama = async (chamaName) => {
         try {
+            console.log(`Joining chama: ${chamaName}`);
             await joinChama(chamaName);
+            console.log(`Successfully joined chama: ${chamaName}`);
             // Optionally, you can refresh the chama list after joining
         } catch (error) {
+            console.error("Error joining chama:", error); // Improved error logging
             setError(error.message);
         }
     };
 
     const handleAddMemberToPrivateChama = async (chamaName, newMember) => {
         try {
+            console.log(`Adding member to private chama: ${chamaName}`);
             await addMemberToPrivateChama(chamaName, newMember);
+            console.log(`Successfully added member to chama: ${chamaName}`);
             // Optionally, you can refresh the chama list after adding a member
         } catch (error) {
+            console.error("Error adding member to private chama:", error); // Improved error logging
             setError(error.message);
         }
     };
 
     const handleContributeFunds = async (chamaName) => {
         try {
+            console.log(`Contributing to chama: ${chamaName}`);
             const isMinimumReached = await isMinimumNumberOfPeopleReached(chamaName);
+            console.log(`Is minimum number of people reached: ${isMinimumReached}`);
             if (isMinimumReached) {
                 setIsContributionStarted(true);
                 const contributionAmount = await getContributionAmount(chamaName);
+                console.log(`Contribution amount for chama ${chamaName}: ${contributionAmount}`);
                 setContributionAmount(ethers.utils.formatEther(contributionAmount));
                 setShowContributionModal(true);
             } else {
                 setError('Minimum number of members required for contributions has not been reached');
             }
         } catch (error) {
+            console.error("Error contributing funds:", error); // Improved error logging
             setError(error.message);
         }
     };
@@ -94,20 +104,19 @@ const ChamaList = () => {
                 return;
             }
 
-            // Verify selectedChama.name and amountAsString before making the contract call
-            console.log("Chama Name:", selectedChama.name);
-            console.log("Amount in Ether:", amountAsString);
+            console.log("Selected Chama Name:", selectedChama.name);
+            console.log("Contribution Amount in Ether:", amountAsString);
             const chamaData = {
                 chamaName: selectedChama.name,
                 amount: amountAsString
-              };
-              
+            };
+
             await contributeFunds(chamaData);
-            // await contributeFunds(selectedChama.name, amountAsString);
             setContributionAmount('');
             setShowContributionModal(false);
             // Optionally, you can refresh the chama list after contributing
         } catch (error) {
+            console.error("Error during contribution:", error); // Improved error logging
             setError(error.message);
         }
     };
@@ -121,7 +130,6 @@ const ChamaList = () => {
         const contributionInKsh = parseFloat(ethers.utils.formatEther(amount)) * ethToKsh;
         return contributionInKsh.toFixed(2);
     };
-
 
     if (loading) {
         return <div>Loading...</div>;
@@ -139,41 +147,40 @@ const ChamaList = () => {
                 {chamas.length === 0 ? (
                     <p>No chamas found.</p>
                 ) : (
-                        <div style={styles.cardContainer}>
-                            {chamas.map((chama, index) => (
-                                <div key={index} style={styles.card}>
-                                    <h3>{chama.name}</h3>
-                                    <p>Max Members: {chama.maxNoOfPeople.toString()}</p>
-                                    <p>Visibility: {chama.visibility === 0 ? 'Public' : 'Private'}</p>
-                                    <p>Owner: {chama.owner}</p>
-                                    <p>Target Amount per Round: {ethers.utils.formatEther(chama.targetAmountPerRound.toString())} ETH</p>
-                                    <p>Total Contribution: {ethers.utils.formatEther(chama.totalContribution.toString())} ETH</p>
-                                    <p>Number of Rounds: {chama.numberOfRounds.toString()}</p>
-                                    <p>Minimum Members: {chama.minimumNoOfPeople.toString()}</p>
-                                    <p>Has Contribution Started: {chama.hasContributionStarted ? 'Yes' : 'No'}</p>
-                                    <p>Current Round: {chama.currentRound.toString()}</p>
-                                    {!isMember(chama, userAddress) && (
-                                        <>
-                                            {chama.visibility === 0 ? (
-                                                <button style={styles.button} onClick={() => handleJoinChama(chama.name)}>Join Chama</button>
-                                            ) : (
-                                                <button style={styles.button} onClick={() => handleAddMemberToPrivateChama(chama.name, userAddress)}>
-                                                    Add Me to Private Chama
-                                                </button>
-                                            )}
-                                        </>
-                                    )}
-                                    {isMember(chama, userAddress) && !chama.hasContributionStarted && !isContributionStarted && (
-                                        <button style={styles.button} onClick={() => handleContributeFunds(chama.name)}>
-                                            Contribute Funds
-                                        </button>
-                                    )}
-                                    {/* Add onClick handler to select chama */}
-                                    <button style={styles.button} onClick={() => setSelectedChama(chama)}>Select Chama</button>
-                                </div>
-                            ))}
-                        </div>
-                    )}
+                    <div style={styles.cardContainer}>
+                        {chamas.map((chama, index) => (
+                            <div key={index} style={styles.card}>
+                                <h3>{chama.name}</h3>
+                                <p>Max Members: {chama.maxNoOfPeople.toString()}</p>
+                                <p>Visibility: {chama.visibility === 0 ? 'Public' : 'Private'}</p>
+                                <p>Owner: {chama.owner}</p>
+                                <p>Target Amount per Round: {ethers.utils.formatEther(chama.targetAmountPerRound.toString())} ETH</p>
+                                <p>Total Contribution: {ethers.utils.formatEther(chama.totalContribution.toString())} ETH</p>
+                                <p>Number of Rounds: {chama.numberOfRounds.toString()}</p>
+                                <p>Minimum Members: {chama.minimumNoOfPeople.toString()}</p>
+                                <p>Has Contribution Started: {chama.hasContributionStarted ? 'Yes' : 'No'}</p>
+                                <p>Current Round: {chama.currentRound.toString()}</p>
+                                {!isMember(chama, userAddress) && (
+                                    <>
+                                        {chama.visibility === 0 ? (
+                                            <button style={styles.button} onClick={() => handleJoinChama(chama.name)}>Join Chama</button>
+                                        ) : (
+                                            <button style={styles.button} onClick={() => handleAddMemberToPrivateChama(chama.name, userAddress)}>
+                                                Add Me to Private Chama
+                                            </button>
+                                        )}
+                                    </>
+                                )}
+                                {isMember(chama, userAddress) && !chama.hasContributionStarted && !isContributionStarted && (
+                                    <button style={styles.button} onClick={() => handleContributeFunds(chama.name)}>
+                                        Contribute Funds
+                                    </button>
+                                )}
+                                <button style={styles.button} onClick={() => setSelectedChama(chama)}>Select Chama</button>
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
             {showContributionModal && (
                 <div style={styles.modal}>
@@ -185,71 +192,68 @@ const ChamaList = () => {
                             value={contributionAmount}
                             onChange={(e) => setContributionAmount(e.target.value)}
                             placeholder="Enter contribution amount"
-                            />
-                            <button style={styles.button} onClick={() => handleContribution()}>
-                                Contribute
-                            </button>
-                            <button style={styles.button} onClick={() => setShowContributionModal(false)}>
-                                Cancel
-                            </button>
-                        </div>
+                        />
+                        <button style={styles.button} onClick={() => handleContribution()}>
+                            Contribute
+                        </button>
+                        <button style={styles.button} onClick={() => setShowContributionModal(false)}>
+                            Cancel
+                        </button>
                     </div>
-                )}
-            </>
-        );
-    };
-    
-    const styles = {
-        page: {
-            backgroundColor: '#0a253b',
-            padding: '20px',
-        },
-        heading: {
-            textAlign: 'center',
-            color: 'white',
-        },
-        cardContainer: {
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '20px',
-            justifyContent: 'center',
-        },
-        card: {
-            backgroundColor: 'white',
-            color: 'black',
-            padding: '20px',
-            borderRadius: '20px',
-            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-            width: '400px',
-        },
-        button: {
-            backgroundColor: '#1fc1c3',
-            color: 'white',
-            padding: '10px',
-            border: 'none',
-            borderRadius: '5px',
-            cursor: 'pointer',
-        },
-        modal: {
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-        },
-        modalContent: {
-            backgroundColor: 'white',
-            padding: '20px',
-            borderRadius: '5px',
-            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-            maxWidth: '400px',
-            textAlign: 'center',
-        },
-    };
-    
+                </div>
+            )}
+        </>
+    );
+};
+
+const styles = {
+    page: {
+        backgroundColor: '#0a253b',
+        padding: '20px',
+    },
+    heading: {
+        textAlign: 'center',
+        color: 'white',
+    },
+    cardContainer: {
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: '20px',
+        justifyContent: 'center',
+    },
+    card: {
+        backgroundColor: 'white',
+        color: 'black',
+        padding: '20px',
+        borderRadius: '20px',
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+        width: '400px',
+    },
+    button: {
+        backgroundColor: '#1fc1c3',
+        color: 'white',
+        padding: '10px',
+        border: 'none',
+        borderRadius: '5px',
+        cursor: 'pointer',
+    },
+    modal: {
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalContent: {
+        backgroundColor: 'white',
+        padding: '20px',
+        borderRadius: '10px',
+        textAlign: 'center',
+    },
+};
+
 export default ChamaList;
-    
