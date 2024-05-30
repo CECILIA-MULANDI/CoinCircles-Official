@@ -13,15 +13,45 @@ const ChamaList = () => {
     const [showContributionModal, setShowContributionModal] = useState(false);
 
     useEffect(() => {
-        // ... (same as before)
+        const fetchChamas = async () => {
+            try {
+                console.log('Fetching chamas...');
+                const chamaDetails = await getAllChamas();
+                console.log('Chamas fetched:', chamaDetails);
+                setChamas(chamaDetails);
+
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                const signer = provider.getSigner();
+                const address = await signer.getAddress();
+                setUserAddress(address);
+            } catch (error) {
+                console.log("error");
+                setError(error.message);
+            } finally {
+                console.log("Loading....");
+                setLoading(false);
+            }
+        };
+
+        fetchChamas();
     }, []);
 
     const handleJoinChama = async (chamaName) => {
-        // ... (same as before)
+        try {
+            await joinChama(chamaName);
+            // Optionally, you can refresh the chama list after joining
+        } catch (error) {
+            setError(error.message);
+        }
     };
 
     const handleAddMemberToPrivateChama = async (chamaName, newMember) => {
-        // ... (same as before)
+        try {
+            await addMemberToPrivateChama(chamaName, newMember);
+            // Optionally, you can refresh the chama list after adding a member
+        } catch (error) {
+            setError(error.message);
+        }
     };
 
     const handleContributeFunds = async (chamaName) => {
@@ -49,6 +79,7 @@ const ChamaList = () => {
         const contributionInKsh = parseFloat(ethers.utils.formatEther(amount)) * ethToKsh;
         return contributionInKsh.toFixed(2);
     };
+  
 
     if (loading) {
         return <div>Loading...</div>;
@@ -59,28 +90,48 @@ const ChamaList = () => {
     }
 
     return (
-        <>
-            <AvailableNavBar />
-            <div style={styles.page}>
-                <h2 style={styles.heading}>Available Chamas</h2>
-                {chamas.length === 0 ? (
-                    <p>No chamas found.</p>
-                ) : (
-                    <div style={styles.cardContainer}>
-                        {chamas.map((chama, index) => (
-                            <div key={index} style={styles.card}>
-                                {/* ... (chama details remain the same) */}
-                                {isMember(chama, userAddress) && !chama.hasContributionStarted && !isContributionStarted && (
+      <>
+      <AvailableNavBar/>
+        <div style={styles.page}>
+            <h2 style={styles.heading}>Available Chamas</h2>
+            {chamas.length === 0 ? (
+                <p>No chamas found.</p>
+            ) : (
+                <div style={styles.cardContainer}>
+                    {chamas.map((chama, index) => (
+                        <div key={index} style={styles.card}>
+                            <h3>{chama.name}</h3>
+                            <p>Max Members: {chama.maxNoOfPeople.toString()}</p>
+                            <p>Visibility: {chama.visibility === 0 ? 'Public' : 'Private'}</p>
+                            <p>Owner: {chama.owner}</p>
+                            <p>Target Amount per Round: {ethers.utils.formatEther(chama.targetAmountPerRound.toString())} ETH</p>
+                            <p>Total Contribution: {ethers.utils.formatEther(chama.totalContribution.toString())} ETH</p>
+                            <p>Number of Rounds: {chama.numberOfRounds.toString()}</p>
+                            <p>Minimum Members: {chama.minimumNoOfPeople.toString()}</p>
+                            <p>Has Contribution Started: {chama.hasContributionStarted ? 'Yes' : 'No'}</p>
+                            <p>Current Round: {chama.currentRound.toString()}</p>
+                            {!isMember(chama, userAddress) && (
+                                <>
+                                    {chama.visibility === 0 ? (
+                                        <button style={styles.button} onClick={() => handleJoinChama(chama.name)}>Join Chama</button>
+                                    ) : (
+                                        <button style={styles.button} onClick={() => handleAddMemberToPrivateChama(chama.name, userAddress)}>
+                                            Add Me to Private Chama
+                                        </button>
+                                    )}
+                                </>
+                            )}
+                             {isMember(chama, userAddress) && !chama.hasContributionStarted && !isContributionStarted && (
                                     <button style={styles.button} onClick={() => handleContributeFunds(chama.name)}>
                                         Contribute Funds
                                     </button>
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                )}
-            </div>
-            {showContributionModal && (
+                            )}
+                        </div>
+                    ))}
+                </div>
+            )}
+        </div>
+        {showContributionModal && (
                 <div style={styles.modal}>
                     <div style={styles.modalContent}>
                         <h3>Contribution Amount</h3>
@@ -146,5 +197,6 @@ const styles = {
         textAlign: 'center',
     },
 };
+
 
 export default ChamaList;
