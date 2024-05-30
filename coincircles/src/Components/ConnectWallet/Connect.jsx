@@ -20,21 +20,19 @@ export default function ConnectWallet() {
         try {
           const provider = new ethers.providers.Web3Provider(window.ethereum);
           const contract = new ethers.Contract(ContractAddress, ContractAbi, provider);
-          const events = await contract.queryFilter(contract.filters.UserConnected());
-          const userEvents = events.filter(event => event.args.wallet_address === walletAddress);
-          if (userEvents.length > 0) {
-            setProvider(provider);
-            setIsConnected(true);
-          } else {
-            setIsConnected(false);
-            setError('No connection found for this wallet address.');
-          }
+  
+          // Check if the wallet address is connected
+          const isConnected = await contract.users(walletAddress).isConnected;
+  
+          setProvider(provider);
+          setIsConnected(isConnected);
         } catch (error) {
           console.error('Error checking connection:', error);
           setError('Error checking connection');
         }
       }
     }
+  
     checkConnection();
   }, [walletAddress]);
 
@@ -46,11 +44,21 @@ export default function ConnectWallet() {
 
   const handleConnect = async () => {
     try {
-      const { address, provider } = await connectUser(setWalletAddress, setProvider, setError);
+      const { address, provider, signer } = await connectUser(setWalletAddress, setProvider, setError);
       setWalletAddress(address);
       setProvider(provider);
+  
+      // Create an instance of the contract
+      const contract = new ethers.Contract(ContractAddress, ContractAbi, signer);
+  
+      // Call the connect_user function
+      const tx = await contract.connect_user();
+      await tx.wait();
+  
       setIsConnected(true);
       localStorage.setItem('walletAddress', address);
+  
+      console.log('Wallet connected successfully');
     } catch (error) {
       console.error('Error connecting wallet:', error);
       setError('Error connecting wallet');
