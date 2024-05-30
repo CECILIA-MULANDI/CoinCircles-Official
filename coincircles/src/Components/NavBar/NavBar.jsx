@@ -38,8 +38,11 @@ function NavBar() {
               </Nav.Item>
             </Nav>
             <Nav>
-              <Nav.Item href='/availableChamas'>
+              <Nav.Item >
+              <Nav.Link href='/availableChamas'>
                 <ConnectWallet />
+                </Nav.Link>
+                
               </Nav.Item>
             </Nav>
           </Navbar.Collapse>
