@@ -80,20 +80,24 @@ const ChamaList = () => {
 
             const provider = new ethers.providers.Web3Provider(window.ethereum);
             const signer = provider.getSigner();
-            
-            const amountInEther = ethers.utils.parseEther(contributionAmount);
-            const amountAsNumber = parseFloat(ethers.utils.formatEther(amountInEther));
-            const amountAsString = ethers.utils.formatEther(amountAsNumber).toString()
 
+            const amountInEther = ethers.utils.parseEther(contributionAmount);
+            const amountAsString = ethers.utils.formatEther(amountInEther);
+
+            if (amountAsString === '0.0') {
+                setError('Contribution amount is too small');
+                return;
+            }
 
             if (!selectedChama) {
                 setError('No chama selected.');
                 return;
             }
 
-            // Verify selectedChama.name and amountInEther before making the contract call
+            // Verify selectedChama.name and amountAsString before making the contract call
             console.log("Chama Name:", selectedChama.name);
-            // console.log("Amount in Ether:", amountAsString);
+            console.log("Amount in Ether:", amountAsString);
+
             await contributeFunds(selectedChama.name, amountAsString);
             setContributionAmount('');
             setShowContributionModal(false);
