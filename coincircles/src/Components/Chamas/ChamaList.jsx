@@ -100,7 +100,7 @@ const ChamaList = () => {
                 return;
             }
     
-            const chamaAddress = selectedChama.contractAddress; // Ensure this property is available
+            const chamaAddress = selectedChama.contractAddress;
             if (!chamaAddress) {
                 setError('Chama contract address not found.');
                 return;
@@ -110,7 +110,16 @@ const ChamaList = () => {
             console.log("Contribution Amount in Ether:", amountInEther.toString());
     
             const chamaContract = new ethers.Contract(chamaAddress, ContractAbi, signer);
-            const tx = await chamaContract.contributeToChama({ value: amountInEther });
+    
+            // Verify that the method exists in the contract
+            const methodName = 'contributeToChama';
+            if (!chamaContract[methodName]) {
+                setError(`Method ${methodName} not found in the contract.`);
+                return;
+            }
+    
+            // Call the method
+            const tx = await chamaContract[methodName]({ value: amountInEther });
             await tx.wait();
     
             console.log('Transaction successful:', tx);
