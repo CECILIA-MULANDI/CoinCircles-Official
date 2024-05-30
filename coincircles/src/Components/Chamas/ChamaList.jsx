@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { getAllChamas, addMemberToPrivateChama, joinChama, isMinimumNumberOfPeopleReached, getContributionAmount, getChamaId } from '../CallContractFunctions/CallContract';
 import { ethers } from 'ethers';
 import AvailableNavBar from '../NavBar/AvailableNavbar';
-
+import ContractAbi from "../../artifacts/contracts/Lock.sol/CoinCircles.json"
 const ChamaList = () => {
     const [chamas, setChamas] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -87,38 +87,42 @@ const ChamaList = () => {
                 setError('Please install MetaMask or another Ethereum-compatible wallet.');
                 return;
             }
-
+    
+            // Request access to the user's Ethereum wallet
+            await window.ethereum.request({ method: 'eth_requestAccounts' });
+    
             const provider = new ethers.providers.Web3Provider(window.ethereum);
             const signer = provider.getSigner();
-
+    
             const amountInEther = ethers.utils.parseEther(contributionAmount);
-
+    
             if (amountInEther.isZero()) {
                 setError('Contribution amount is too small');
                 return;
             }
-
+    
             if (!selectedChama) {
                 setError('No chama selected.');
                 return;
             }
-
+    
             const chamaAddress = await getChamaId(selectedChama.name); // Assuming this returns the contract address
             if (!chamaAddress) {
                 setError('Chama contract address not found.');
                 return;
             }
-
+    
             console.log("Selected Chama Address:", chamaAddress);
             console.log("Contribution Amount in Ether:", amountInEther.toString());
-
-            const tx = {
-                to: chamaAddress,
-                value: amountInEther
-            };
-
-            const transaction = await signer.sendTransaction(tx);
-            console.log('Transaction successful:', transaction);
+    
+            // Create an instance of the contract
+            const chamaContract = new ethers.Contract(chamaAddress, ContractAbi, signer);
+    
+            // Call the appropriate function to make the contribution
+            const tx = await chamaContract.contributeToChama({ value: amountInEther });
+            await tx.wait();
+    
+            console.log('Transaction successful:', tx);
             setContributionAmount('');
             setShowContributionModal(false);
             // Optionally, you can refresh the chama list after contributing
@@ -127,6 +131,7 @@ const ChamaList = () => {
             setError(error.message);
         }
     };
+    
 
     const isMember = (chama, userAddress) => {
         return chama.listOfMembers.includes(userAddress);
