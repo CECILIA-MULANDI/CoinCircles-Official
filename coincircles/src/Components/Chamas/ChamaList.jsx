@@ -3,7 +3,8 @@ import { getAllChamas, addMemberToPrivateChama, joinChama, isMinimumNumberOfPeop
 import { ethers } from 'ethers';
 import AvailableNavBar from '../NavBar/AvailableNavbar';
 import ContractAbi from "../../artifacts/contracts/Lock.sol/CoinCircles.json";
-
+// import { ContractAddress } from '../Constants/Constants';
+const contractAddress='0x13B33BEd26F4c0819110B86c1B621fa0407e5B31';
 const ChamaList = () => {
     const [chamas, setChamas] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -92,12 +93,12 @@ const ChamaList = () => {
             }
     
             const chamaAddress = selectedChama.contractAddress; // Ensure this property is available
-            if (!chamaAddress) {
-                setError('Chama contract address not found.');
-                return;
-            }
+            // if (!chamaAddress) {
+            //     setError('Chama contract address not found.');
+            //     return;
+            // }
     
-            console.log("Selected Chama Address:", chamaAddress);
+            // console.log("Selected Chama Address:", chamaAddress);
             console.log("Contribution Amount in Ether:", amountInEther.toString());
     
             const chamaContract = new ethers.Contract(chamaAddress, ContractAbi, signer);
