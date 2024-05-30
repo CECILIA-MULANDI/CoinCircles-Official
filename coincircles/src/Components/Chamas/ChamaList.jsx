@@ -82,13 +82,7 @@ const ChamaList = () => {
             const signer = provider.getSigner();
             
             const amountInEther = ethers.utils.parseEther(contributionAmount);
-            // const contributionData = {
-            //     chamaName: selectedChama.name,
-            //     amount: amountAsString,
-            //     signer: signer // If the signer is required
-            //   };
-              
-             
+            const amountAsNumber = parseFloat(ethers.utils.formatEther(amountInEther));
 
 
             if (!selectedChama) {
@@ -99,7 +93,7 @@ const ChamaList = () => {
             // Verify selectedChama.name and amountInEther before making the contract call
             console.log("Chama Name:", selectedChama.name);
             // console.log("Amount in Ether:", amountAsString);
-            await contributeFunds(selectedChama.name, amountInEther);
+            await contributeFunds(selectedChama.name, amountAsNumber);
             setContributionAmount('');
             setShowContributionModal(false);
             // Optionally, you can refresh the chama list after contributing
