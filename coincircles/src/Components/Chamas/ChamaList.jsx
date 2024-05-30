@@ -18,9 +18,12 @@ const ChamaList = () => {
     const [selectedChama, setSelectedChama] = useState(null);
     const handleSelectChama = (chama) => {
         setSelectedChama(chama);
-        console.log('Selected Chama:', selectedChama.name);
+        // console.log('Selected Chama:', selectedChama.name);
     };
     useEffect(() => {
+        if(selectedChama) {
+            console.log('Selected Chama:', selectedChama.name);
+        }
         const fetchChamas = async () => {
             try {
                 const chamaDetails = await getAllChamas();
