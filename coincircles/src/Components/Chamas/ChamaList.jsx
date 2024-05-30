@@ -175,6 +175,7 @@ const ChamaList = () => {
     
             console.log("Selected Chama Address:", chamaAddress);
             console.log("Contribution Amount in Ether:", amountInEther.toString());
+            console.log("Contribution Amount:", contributionAmount);
     
             const chamaContract = new ethers.Contract(chamaAddress, ContractAbi, signer);
     
