@@ -20,8 +20,15 @@ const ChamaList = () => {
             try {
                 const chamaDetails = await getAllChamas();
                 console.log('Chamas fetched:', chamaDetails); // Log the fetched details
-                setChamas(chamaDetails);
-    
+        
+                // Ensure each chama object includes the contractAddress property
+                const chamasWithContractAddress = chamaDetails.map(chama => ({
+                    ...chama,
+                    contractAddress: '0x13B33BEd26F4c0819110B86c1B621fa0407e5B31' // Replace with actual contract address
+                }));
+        
+                setChamas(chamasWithContractAddress);
+        
                 const provider = new ethers.providers.Web3Provider(window.ethereum);
                 const signer = provider.getSigner();
                 const address = await signer.getAddress();
@@ -32,6 +39,7 @@ const ChamaList = () => {
                 setLoading(false);
             }
         };
+        
     
         fetchChamas();
     }, []);
