@@ -11,7 +11,7 @@ export default function ConnectWallet() {
   const [walletAddress, setWalletAddress] = useState(localStorage.getItem('walletAddress'));
   const [error, setError] = useState(null);
   const [provider, setProvider] = useState(null);
-  const [isConnected, setIsConnected] = useState(false);
+  const [isConnected, setIsConnected] = useState(!!walletAddress);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -25,6 +25,9 @@ export default function ConnectWallet() {
           if (userEvents.length > 0) {
             setProvider(provider);
             setIsConnected(true);
+          } else {
+            setIsConnected(false);
+            setError('No connection found for this wallet address.');
           }
         } catch (error) {
           console.error('Error checking connection:', error);
@@ -42,13 +45,24 @@ export default function ConnectWallet() {
   }, [isConnected, navigate]);
 
   const handleConnect = async () => {
-    await connectUser(setWalletAddress, setProvider, setError);
-    setIsConnected(true);
+    try {
+      const { address, provider } = await connectUser();
+      setWalletAddress(address);
+      setProvider(provider);
+      setIsConnected(true);
+      localStorage.setItem('walletAddress', address);
+    } catch (error) {
+      console.error('Error connecting wallet:', error);
+      setError('Error connecting wallet');
+    }
   };
 
   const handleDisconnect = () => {
-    disconnectWallet(setWalletAddress);
+    disconnectWallet();
+    setWalletAddress(null);
+    setProvider(null);
     setIsConnected(false);
+    localStorage.removeItem('walletAddress');
   };
 
   return (
