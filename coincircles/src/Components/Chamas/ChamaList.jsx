@@ -93,12 +93,12 @@ const ChamaList = () => {
             }
     
             const chamaAddress = selectedChama.contractAddress; // Ensure this property is available
-            // if (!chamaAddress) {
-            //     setError('Chama contract address not found.');
-            //     return;
-            // }
+            if (!chamaAddress) {
+                setError('Chama contract address not found.');
+                return;
+            }
     
-            // console.log("Selected Chama Address:", chamaAddress);
+            console.log("Selected Chama Address:", chamaAddress);
             console.log("Contribution Amount in Ether:", amountInEther.toString());
     
             const chamaContract = new ethers.Contract(chamaAddress, ContractAbi, signer);
