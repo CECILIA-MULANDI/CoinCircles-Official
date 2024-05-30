@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { getAllChamas, addMemberToPrivateChama, joinChama, isMinimumNumberOfPeopleReached, getContributionAmount, getChamaId } from '../CallContractFunctions/CallContract';
+import { getAllChamas, addMemberToPrivateChama, joinChama, isMinimumNumberOfPeopleReached, getContributionAmount } from '../CallContractFunctions/CallContract';
 import { ethers } from 'ethers';
 import AvailableNavBar from '../NavBar/AvailableNavbar';
-import ContractAbi from "../../artifacts/contracts/Lock.sol/CoinCircles.json"
+import ContractAbi from "../../artifacts/contracts/Lock.sol/CoinCircles.json";
+
 const ChamaList = () => {
     const [chamas, setChamas] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -16,9 +17,7 @@ const ChamaList = () => {
     useEffect(() => {
         const fetchChamas = async () => {
             try {
-                console.log('Fetching chamas...');
                 const chamaDetails = await getAllChamas();
-                console.log('Chamas fetched:', chamaDetails);
                 setChamas(chamaDetails);
 
                 const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -26,10 +25,8 @@ const ChamaList = () => {
                 const address = await signer.getAddress();
                 setUserAddress(address);
             } catch (error) {
-                console.error("Error fetching chamas:", error); // Improved error logging
                 setError(error.message);
             } finally {
-                console.log("Loading....");
                 setLoading(false);
             }
         };
@@ -39,44 +36,32 @@ const ChamaList = () => {
 
     const handleJoinChama = async (chamaName) => {
         try {
-            console.log(`Joining chama: ${chamaName}`);
             await joinChama(chamaName);
-            console.log(`Successfully joined chama: ${chamaName}`);
-            // Optionally, you can refresh the chama list after joining
         } catch (error) {
-            console.error("Error joining chama:", error); // Improved error logging
             setError(error.message);
         }
     };
 
     const handleAddMemberToPrivateChama = async (chamaName, newMember) => {
         try {
-            console.log(`Adding member to private chama: ${chamaName}`);
             await addMemberToPrivateChama(chamaName, newMember);
-            console.log(`Successfully added member to chama: ${chamaName}`);
-            // Optionally, you can refresh the chama list after adding a member
         } catch (error) {
-            console.error("Error adding member to private chama:", error); // Improved error logging
             setError(error.message);
         }
     };
 
     const handleContributeFunds = async (chamaName) => {
         try {
-            console.log(`Contributing to chama: ${chamaName}`);
             const isMinimumReached = await isMinimumNumberOfPeopleReached(chamaName);
-            console.log(`Is minimum number of people reached: ${isMinimumReached}`);
             if (isMinimumReached) {
                 setIsContributionStarted(true);
                 const contributionAmount = await getContributionAmount(chamaName);
-                console.log(`Contribution amount for chama ${chamaName}: ${contributionAmount}`);
                 setContributionAmount(ethers.utils.formatEther(contributionAmount));
                 setShowContributionModal(true);
             } else {
                 setError('Minimum number of members required for contributions has not been reached');
             }
         } catch (error) {
-            console.error("Error contributing funds:", error); // Improved error logging
             setError(error.message);
         }
     };
@@ -103,22 +88,22 @@ const ChamaList = () => {
                 return;
             }
 
-            console.log(selectedChama); // Debug selectedChama
-            const chamaId = await getChamaId(selectedChama.name);
-            console.log(chamaId); // Debug chamaId
+            const chamaAddress = selectedChama.contractAddress;
+            if (!chamaAddress) {
+                setError('Chama contract address not found.');
+                return;
+            }
 
-            const chamaContract = new ethers.Contract(chamaId, ContractAbi, signer);
+            const chamaContract = new ethers.Contract(chamaAddress, ContractAbi, signer);
             const tx = await chamaContract.contributeToChama({ value: amountInEther });
             await tx.wait();
 
             setContributionAmount('');
             setShowContributionModal(false);
         } catch (error) {
-            console.error("Error during contribution:", error);
             setError(error.message);
         }
     };
-    
 
     const isMember = (chama, userAddress) => {
         return chama.listOfMembers.includes(userAddress);
