@@ -4,33 +4,32 @@ import { ethers } from "ethers";
 
 
 
-async function connectUser(setWalletAddress, setProvider, setError) {
-  try {
-    // Check if MetaMask is installed
-    if (typeof window.ethereum !== 'undefined') {
-      // Request account access if needed
-      await window.ethereum.request({ method: 'eth_requestAccounts' });
-      
-      // Get the provider
+export const connectUser = async (setWalletAddress, setProvider, setError) => {
+  if (window.ethereum) {
+    try {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
-      setProvider(provider);
-      
-      // Get the user's address
-      const accounts = await provider.listAccounts();
-      const walletAddress = accounts[0];
-      setWalletAddress(walletAddress);
-    } else {
-      throw new Error('MetaMask extension not detected');
-    }
-  } catch (error) {
-    console.error('Error connecting to wallet:', error);
-    setError('Error connecting to wallet');
-  }
-}
+      await provider.send("eth_requestAccounts", []);
+      const signer = provider.getSigner();
+      const address = await signer.getAddress();
 
-export { connectUser };
+      // Store the connection details in local storage
+      localStorage.setItem('walletAddress', address);
+      setWalletAddress(address);
+      setProvider(provider);
+      setError(null);
+
+      return { provider, signer, address };
+    } catch (error) {
+      console.error("Failed to connect wallet", error);
+      setError("Failed to connect wallet");
+    }
+  } else {
+    setError("MetaMask is not installed");
+  }
+};
 
 export const disconnectWallet = (setWalletAddress) => {
+  localStorage.removeItem('walletAddress');
   setWalletAddress(null);
 };
 export const connectToContract = async () => {
