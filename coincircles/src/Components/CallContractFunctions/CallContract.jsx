@@ -170,13 +170,14 @@ export const disconnectWallet = (setWalletAddress) => {
       throw error;
     }
   };
+
 export const getChamaId = async (chamaName) => {
-    try {
+  try {
       const contract = await connectToContract();
       const chamaId = await contract.getChamaId(chamaName);
       return chamaId;
-    } catch (error) {
+  } catch (error) {
       console.error('Error getting chama ID:', error);
       throw error;
-    }
   }
+};
