@@ -87,44 +87,34 @@ const ChamaList = () => {
                 setError('Please install MetaMask or another Ethereum-compatible wallet.');
                 return;
             }
-    
-            // Request access to the user's Ethereum wallet
+
             await window.ethereum.request({ method: 'eth_requestAccounts' });
-    
             const provider = new ethers.providers.Web3Provider(window.ethereum);
             const signer = provider.getSigner();
-    
             const amountInEther = ethers.utils.parseEther(contributionAmount);
-    
+
             if (amountInEther.isZero()) {
                 setError('Contribution amount is too small');
                 return;
             }
-    
+
             if (!selectedChama) {
                 setError('No chama selected.');
                 return;
             }
-    
+
+            console.log(selectedChama); // Debug selectedChama
             const chamaId = await getChamaId(selectedChama.name);
-           
+            console.log(chamaId); // Debug chamaId
+
             const chamaContract = new ethers.Contract(chamaId, ContractAbi, signer);
-            // console.log("Selected Chama Address:", chamaAddress);
-            console.log("Contribution Amount in Ether:", amountInEther.toString());
-    
-            // Create an instance of the contract
-            // const chamaContract = new ethers.Contract(chamaAddress, ContractAbi, signer);
-    
-            // Call the appropriate function to make the contribution
             const tx = await chamaContract.contributeToChama({ value: amountInEther });
             await tx.wait();
-    
-            console.log('Transaction successful:', tx);
+
             setContributionAmount('');
             setShowContributionModal(false);
-            // Optionally, you can refresh the chama list after contributing
         } catch (error) {
-            console.error("Error during contribution:", error); // Improved error logging
+            console.error("Error during contribution:", error);
             setError(error.message);
         }
     };
