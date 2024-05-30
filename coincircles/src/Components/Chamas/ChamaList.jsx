@@ -138,41 +138,42 @@ const ChamaList = () => {
             setError(error.message);
         }
     };
-    
-
     const handleContribution = async () => {
         try {
+            // Check if MetaMask or another Ethereum-compatible wallet is installed
             if (!window.ethereum) {
                 setError('Please install MetaMask or another Ethereum-compatible wallet.');
                 return;
             }
     
+            // Request account access from the user
             await window.ethereum.request({ method: 'eth_requestAccounts' });
     
+            // Create a provider and signer using the Web3Provider
             const provider = new ethers.providers.Web3Provider(window.ethereum);
             const signer = provider.getSigner();
-            const amountInEther = ethers.utils.parseEther(contributionAmount);
     
-            if (amountInEther.isZero()) {
-                setError('Contribution amount is too small');
+            // Parse contributionAmount into Ether
+            if (!contributionAmount || isNaN(parseFloat(contributionAmount))) {
+                setError('Invalid contribution amount.');
                 return;
             }
+            const amountInEther = ethers.utils.parseEther(contributionAmount);
     
+            // Check if selectedChama is valid
             if (!selectedChama) {
                 setError('No chama selected.');
                 return;
             }
     
+            // Get the contract address of the selectedChama
             const chamaAddress = selectedChama.contractAddress;
             if (!chamaAddress) {
                 setError('Chama contract address not found.');
                 return;
             }
-            console.log("chama selected");
     
-            console.log("Selected Chama Address:", chamaAddress);
-            console.log("Contribution Amount in Ether:", amountInEther.toString());
-    
+            // Create a Contract instance using the contract address and ABI
             const chamaContract = new ethers.Contract(chamaAddress, ContractAbi, signer);
     
             // Verify that the method exists in the contract
@@ -182,10 +183,11 @@ const ChamaList = () => {
                 return;
             }
     
-            // Call the method
+            // Call the contributeFunds method in the contract with the specified value
             const tx = await chamaContract[methodName]({ value: amountInEther });
             await tx.wait();
     
+            // Contribution successful, reset state and close modal
             console.log('Transaction successful:', tx);
             setContributionAmount('');
             setShowContributionModal(false);
@@ -194,6 +196,63 @@ const ChamaList = () => {
             setError(error.message);
         }
     };
+    
+    
+
+    // const handleContribution = async () => {
+    //     try {
+    //         if (!window.ethereum) {
+    //             setError('Please install MetaMask or another Ethereum-compatible wallet.');
+    //             return;
+    //         }
+    
+    //         await window.ethereum.request({ method: 'eth_requestAccounts' });
+    
+    //         const provider = new ethers.providers.Web3Provider(window.ethereum);
+    //         const signer = provider.getSigner();
+    //         const amountInEther = ethers.utils.parseEther(contributionAmount);
+    
+    //         if (amountInEther.isZero()) {
+    //             setError('Contribution amount is too small');
+    //             return;
+    //         }
+    
+    //         if (!selectedChama) {
+    //             setError('No chama selected.');
+    //             return;
+    //         }
+    
+    //         const chamaAddress = selectedChama.contractAddress;
+    //         if (!chamaAddress) {
+    //             setError('Chama contract address not found.');
+    //             return;
+    //         }
+    //         console.log("chama selected");
+    
+    //         console.log("Selected Chama Address:", chamaAddress);
+    //         console.log("Contribution Amount in Ether:", amountInEther.toString());
+    
+    //         const chamaContract = new ethers.Contract(chamaAddress, ContractAbi, signer);
+    
+    //         // Verify that the method exists in the contract
+    //         const methodName = 'contributeFunds';
+    //         if (!chamaContract[methodName]) {
+    //             setError(`Method ${methodName} not found in the contract.`);
+    //             return;
+    //         }
+    
+    //         // Call the method
+    //         const tx = await chamaContract[methodName]({ value: amountInEther });
+    //         await tx.wait();
+    
+    //         console.log('Transaction successful:', tx);
+    //         setContributionAmount('');
+    //         setShowContributionModal(false);
+    //     } catch (error) {
+    //         console.error("Error during contribution:", error);
+    //         setError(error.message);
+    //     }
+    // };
     
     
 
