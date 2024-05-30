@@ -83,8 +83,14 @@ const ChamaList = () => {
             
             const amountInEther = ethers.utils.parseEther(contributionAmount);
             const amountAsString = amountInEther.toString(); // Convert to string if needed
-            
-            await contributeFunds(selectedChama.name, amountAsString, signer);
+            const contributionData = {
+                chamaName: selectedChama.name,
+                amount: amountAsString,
+                signer: signer // If the signer is required
+              };
+              
+              await contributeFunds(contributionData);
+            // await contributeFunds(selectedChama.name, amountAsString, signer);
 
 
             if (!selectedChama) {
