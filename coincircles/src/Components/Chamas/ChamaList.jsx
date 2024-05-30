@@ -104,6 +104,11 @@ const ChamaList = () => {
             }
 
             const chamaAddress = await getChamaId(selectedChama.name); // Assuming this returns the contract address
+            if (!chamaAddress) {
+                setError('Chama contract address not found.');
+                return;
+            }
+
             console.log("Selected Chama Address:", chamaAddress);
             console.log("Contribution Amount in Ether:", amountInEther.toString());
 
