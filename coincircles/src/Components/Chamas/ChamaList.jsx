@@ -80,6 +80,10 @@ const ChamaList = () => {
           const signer = provider.getSigner();
           const amountInEther = ethers.utils.parseEther(contributionAmount);
       
+          // Verify chama.name and amountInEther before making the contract call
+          console.log("Chama Name:", chama.name);
+          console.log("Amount in Ether:", amountInEther.toString());
+      
           await contributeFunds(chama.name, amountInEther, signer);
           setContributionAmount('');
           setShowContributionModal(false);
@@ -88,6 +92,7 @@ const ChamaList = () => {
           setError(error.message);
         }
       };
+      
       
 
     const isMember = (chama, userAddress) => {
