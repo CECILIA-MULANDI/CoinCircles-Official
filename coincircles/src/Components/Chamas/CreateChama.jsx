@@ -15,23 +15,23 @@ const CreateChama = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     try {
-      await createChama(chamaName, maxMembers, chamaVisibility, minimumMembers, targetAmount);
-      setSuccessMessage(`Chama "${chamaName}" created successfully!`);
+      const successMsg = await createChama(chamaName, maxMembers, chamaVisibility, minimumMembers, targetAmount);
+      setSuccessMessage(successMsg);
       resetForm();
-      clearTimeout(messageTimeout); // Clear any previous timeout
+      clearTimeout(messageTimeout);
       const timeout = setTimeout(() => {
         setSuccessMessage('');
-      }, 5000); // Show success message for 5 seconds
+      }, 5000);
       setMessageTimeout(timeout);
     } catch (error) {
       setErrorMessage(error.message);
       setSuccessMessage('');
-      clearTimeout(messageTimeout); // Clear any previous timeout
+      clearTimeout(messageTimeout);
       const timeout = setTimeout(() => {
         setErrorMessage('');
-      }, 5000); // Show error message for 5 seconds
+      }, 5000);
       setMessageTimeout(timeout);
     }
   };
@@ -43,7 +43,7 @@ const CreateChama = () => {
     setMinimumMembers('');
     setTargetAmount('');
     setErrorMessage('');
-    clearTimeout(messageTimeout); // Clear the message timeout
+    clearTimeout(messageTimeout);
     setMessageTimeout(null);
   };
 
@@ -108,7 +108,7 @@ const CreateChama = () => {
               />
             </Form.Group>
 
-            <Button variant="primary" type="submit" className='create-btn'>
+            <Button variant="primary" type="submit" className="create-btn">
               Create Chama
             </Button>
           </Form>
