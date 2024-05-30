@@ -105,6 +105,7 @@ const ChamaList = () => {
                 setError('Chama contract address not found.');
                 return;
             }
+            console.log("chama selected");
     
             console.log("Selected Chama Address:", chamaAddress);
             console.log("Contribution Amount in Ether:", amountInEther.toString());
