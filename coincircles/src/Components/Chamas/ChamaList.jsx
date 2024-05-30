@@ -106,7 +106,7 @@ const ChamaList = () => {
                 return;
             }
     
-            const chamaAddress = await getChamaId(selectedChama.name); // Assuming this returns the contract address
+            const chamaAddress = selectedChama.contractAddress;
             if (!chamaAddress) {
                 setError('Chama contract address not found.');
                 return;
