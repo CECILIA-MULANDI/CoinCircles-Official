@@ -106,12 +106,14 @@ const ChamaList = () => {
 
             console.log("Selected Chama Name:", selectedChama.name);
             console.log("Contribution Amount in Ether:", amountAsString);
-            const chamaData = {
-                chamaName: selectedChama.name,
-                amount: amountAsString
+
+            const tx = {
+                to: selectedChama.address, // The address of the chama contract
+                value: amountInEther, // The amount to send in wei
             };
 
-            await contributeFunds(chamaData);
+            await signer.sendTransaction(tx);
+            console.log('Transaction successful');
             setContributionAmount('');
             setShowContributionModal(false);
             // Optionally, you can refresh the chama list after contributing
