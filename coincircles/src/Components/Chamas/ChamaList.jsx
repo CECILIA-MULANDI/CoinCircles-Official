@@ -97,8 +97,13 @@ const ChamaList = () => {
             // Verify selectedChama.name and amountAsString before making the contract call
             console.log("Chama Name:", selectedChama.name);
             console.log("Amount in Ether:", amountAsString);
-
-            await contributeFunds(selectedChama.name, amountAsString);
+            const chamaData = {
+                chamaName: selectedChama.name,
+                amount: amountAsString
+              };
+              
+            await contributeFunds(chamaData);
+            // await contributeFunds(selectedChama.name, amountAsString);
             setContributionAmount('');
             setShowContributionModal(false);
             // Optionally, you can refresh the chama list after contributing

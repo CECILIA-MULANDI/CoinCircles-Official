@@ -129,17 +129,26 @@ export const disconnectWallet = (setWalletAddress) => {
     }
   };
   
-  export const contributeFunds = async (chamaName, amount) => {
+  // export const contributeFunds = async (chamaName, amount) => {
+  //   try {
+  //     const contract = await connectToContract();
+  //     const tx = await contract.contributeFunds(chamaName, amount);
+  //     await tx.wait();
+  //   } catch (error) {
+  //     console.error('Error contributing funds:', error);
+  //     throw error;
+  //   }
+  // };
+  export const contributeFunds = async (chamaData) => {
     try {
       const contract = await connectToContract();
-      const tx = await contract.contributeFunds(chamaName, amount);
+      const tx = await contract.contributeFunds(chamaData);
       await tx.wait();
     } catch (error) {
       console.error('Error contributing funds:', error);
       throw error;
     }
   };
-  
   export const isMinimumNumberOfPeopleReached = async (chamaName) => {
     try {
       const contract = await connectToContract();
