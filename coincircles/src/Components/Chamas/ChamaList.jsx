@@ -9,7 +9,7 @@ const ChamaList = () => {
     const [error, setError] = useState(null);
     const [userAddress, setUserAddress] = useState(null);
     const [isContributionStarted, setIsContributionStarted] = useState(false);
-    const [contributionAmount, setContributionAmount] = useState(null);
+    const [contributionAmount, setContributionAmount] = useState('');
     const [showContributionModal, setShowContributionModal] = useState(false);
 
     useEffect(() => {
@@ -56,19 +56,39 @@ const ChamaList = () => {
 
     const handleContributeFunds = async (chamaName) => {
         try {
-            const isMinimumReached = await isMinimumNumberOfPeopleReached(chamaName);
-            if (isMinimumReached) {
-                setIsContributionStarted(true);
-                const contributionAmount = await getContributionAmount(chamaName);
-                setContributionAmount(contributionAmount);
-                setShowContributionModal(true);
-            } else {
-                setError('Minimum number of members required for contributions has not been reached');
-            }
+          const isMinimumReached = await isMinimumNumberOfPeopleReached(chamaName);
+          if (isMinimumReached) {
+            setIsContributionStarted(true);
+            const contributionAmount = await getContributionAmount(chamaName);
+            setContributionAmount(ethers.utils.formatEther(contributionAmount));
+            setShowContributionModal(true);
+          } else {
+            setError('Minimum number of members required for contributions has not been reached');
+          }
         } catch (error) {
-            setError(error.message);
+          setError(error.message);
         }
-    };
+      };
+      const handleContribution = async (chama) => {
+        try {
+          if (!window.ethereum) {
+            setError('Please install MetaMask or another Ethereum-compatible wallet.');
+            return;
+          }
+      
+          const provider = new ethers.providers.Web3Provider(window.ethereum);
+          const signer = provider.getSigner();
+          const amountInEther = ethers.utils.parseEther(contributionAmount);
+      
+          await contributeFunds(chama.name, amountInEther, signer);
+          setContributionAmount('');
+          setShowContributionModal(false);
+          // Optionally, you can refresh the chama list after contributing
+        } catch (error) {
+          setError(error.message);
+        }
+      };
+      
 
     const isMember = (chama, userAddress) => {
         return chama.listOfMembers.includes(userAddress);
@@ -132,16 +152,25 @@ const ChamaList = () => {
             )}
         </div>
         {showContributionModal && (
-                <div style={styles.modal}>
-                    <div style={styles.modalContent}>
-                        <h3>Contribution Amount</h3>
-                        <p>Your contribution amount is {formatContributionAmount(contributionAmount)} Kenyan Shillings (KES).</p>
-                        <button style={styles.button} onClick={() => setShowContributionModal(false)}>
-                            Close
-                        </button>
-                    </div>
-                </div>
-            )}
+  <div style={styles.modal}>
+    <div style={styles.modalContent}>
+      <h3>Contribution Amount</h3>
+      <p>Your contribution amount is {contributionAmount} ETH.</p>
+      <input
+        type="text"
+        value={contributionAmount}
+        onChange={(e) => setContributionAmount(e.target.value)}
+        placeholder="Enter contribution amount"
+      />
+        <button style={styles.button} onClick={() => handleContribution(chamas)}>
+    Contribute
+    </button>
+      <button style={styles.button} onClick={() => setShowContributionModal(false)}>
+        Cancel
+      </button>
+    </div>
+  </div>
+)}
         </>
     );
 };
