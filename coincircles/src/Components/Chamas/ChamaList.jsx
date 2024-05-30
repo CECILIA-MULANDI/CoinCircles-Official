@@ -14,7 +14,9 @@ const ChamaList = () => {
     const [contributionAmount, setContributionAmount] = useState('');
     const [showContributionModal, setShowContributionModal] = useState(false);
     const [selectedChama, setSelectedChama] = useState(null);
-
+    const handleSelectChama = (chama) => {
+        setSelectedChama(chama);
+    };
     useEffect(() => {
         const fetchChamas = async () => {
             try {
@@ -197,7 +199,7 @@ const ChamaList = () => {
                 Contribute Funds
             </button>
         )}
-        <button style={styles.button} onClick={() => setSelectedChama(chama)}>Select Chama</button>
+        <button style={styles.button} onClick={() => handleSelectChama(chama)}>Select Chama</button>
     </div>
 ))}
 
