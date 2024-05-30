@@ -46,7 +46,7 @@ export default function ConnectWallet() {
 
   const handleConnect = async () => {
     try {
-      const { address, provider } = await connectUser();
+      const { address, provider } = await connectUser(setWalletAddress, setProvider, setError);
       setWalletAddress(address);
       setProvider(provider);
       setIsConnected(true);
@@ -58,7 +58,7 @@ export default function ConnectWallet() {
   };
 
   const handleDisconnect = () => {
-    disconnectWallet();
+    disconnectWallet(setWalletAddress);
     setWalletAddress(null);
     setProvider(null);
     setIsConnected(false);

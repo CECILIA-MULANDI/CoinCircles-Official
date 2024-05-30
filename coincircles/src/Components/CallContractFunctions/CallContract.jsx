@@ -32,6 +32,8 @@ export const disconnectWallet = (setWalletAddress) => {
   localStorage.removeItem('walletAddress');
   setWalletAddress(null);
 };
+
+
 export const connectToContract = async () => {
     try {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
