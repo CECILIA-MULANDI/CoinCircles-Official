@@ -150,6 +150,12 @@
                 "internalType": "uint256",
                 "name": "amountReceived",
                 "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "round",
+                "type": "uint256"
             }
         ],
         "name": "FundsReceived",
@@ -183,17 +189,6 @@
         ],
         "name": "MemberAddedToPrivateChama",
         "type": "event"
-    },
-    {
-        "inputs": [{
-            "internalType": "string",
-            "name": "_name",
-            "type": "string"
-        }],
-        "name": "startVoting",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
     },
     {
         "anonymous": false,
@@ -250,16 +245,10 @@
     },
     {
         "inputs": [{
-                "internalType": "string",
-                "name": "_name",
-                "type": "string"
-            },
-            {
-                "internalType": "address",
-                "name": "recipient",
-                "type": "address"
-            }
-        ],
+            "internalType": "string",
+            "name": "_name",
+            "type": "string"
+        }],
         "name": "voteForRecipient",
         "outputs": [],
         "stateMutability": "nonpayable",
@@ -387,17 +376,17 @@
     },
     {
         "inputs": [{
-                "internalType": "address",
-                "name": "",
-                "type": "address"
-            },
-            {
                 "internalType": "uint256",
                 "name": "",
                 "type": "uint256"
+            },
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
             }
         ],
-        "name": "fundsReceived",
+        "name": "fundsReceivedInRound",
         "outputs": [{
             "internalType": "bool",
             "name": "",
@@ -484,12 +473,84 @@
             "name": "_name",
             "type": "string"
         }],
+        "name": "getContributionAmount",
+        "outputs": [{
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+            "internalType": "string",
+            "name": "_name",
+            "type": "string"
+        }],
+        "name": "getCurrentRecipient",
+        "outputs": [{
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+            "internalType": "address",
+            "name": "_member",
+            "type": "address"
+        }],
+        "name": "getMemberChamasAndAmountReceived",
+        "outputs": [{
+                "internalType": "string[]",
+                "name": "chamaNames",
+                "type": "string[]"
+            },
+            {
+                "internalType": "uint256[]",
+                "name": "amountsReceived",
+                "type": "uint256[]"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+            "internalType": "string",
+            "name": "_name",
+            "type": "string"
+        }],
         "name": "getPossibleRecipients",
         "outputs": [{
             "internalType": "address[]",
             "name": "",
             "type": "address[]"
         }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+            "internalType": "address",
+            "name": "_userAddress",
+            "type": "address"
+        }],
+        "name": "getUserProfileDetails",
+        "outputs": [{
+                "internalType": "string[]",
+                "name": "chamaNames",
+                "type": "string[]"
+            },
+            {
+                "internalType": "uint256[]",
+                "name": "amountsReceived",
+                "type": "uint256[]"
+            }
+        ],
         "stateMutability": "view",
         "type": "function"
     },
@@ -552,6 +613,57 @@
             "internalType": "bool",
             "name": "",
             "type": "bool"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+            "internalType": "string",
+            "name": "_name",
+            "type": "string"
+        }],
+        "name": "isMinimumNumberOfPeopleReached",
+        "outputs": [{
+            "internalType": "bool",
+            "name": "",
+            "type": "bool"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            },
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "name": "totalAmountReceivedByMember",
+        "outputs": [{
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+        }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+        }],
+        "name": "userProfiles",
+        "outputs": [{
+            "internalType": "address",
+            "name": "userAddress",
+            "type": "address"
         }],
         "stateMutability": "view",
         "type": "function"
