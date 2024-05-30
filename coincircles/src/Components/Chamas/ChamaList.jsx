@@ -91,7 +91,8 @@ const ChamaList = () => {
             console.log("Chama Name:", selectedChama.name);
             console.log("Amount in Ether:", amountInEther.toString());
 
-            await contributeFunds(selectedChama.name, amountInEther, signer);
+            // await contributeFunds(selectedChama.name, amountInEther, signer);
+            await contributeFunds(selectedChama.name)
             setContributionAmount('');
             setShowContributionModal(false);
             // Optionally, you can refresh the chama list after contributing
