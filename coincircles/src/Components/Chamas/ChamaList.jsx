@@ -18,8 +18,9 @@ const ChamaList = () => {
         const fetchChamas = async () => {
             try {
                 const chamaDetails = await getAllChamas();
+                console.log('Chamas fetched:', chamaDetails); // Log the fetched details
                 setChamas(chamaDetails);
-
+    
                 const provider = new ethers.providers.Web3Provider(window.ethereum);
                 const signer = provider.getSigner();
                 const address = await signer.getAddress();
@@ -30,9 +31,10 @@ const ChamaList = () => {
                 setLoading(false);
             }
         };
-
+    
         fetchChamas();
     }, []);
+    
 
     const handleJoinChama = async (chamaName) => {
         try {
@@ -72,38 +74,45 @@ const ChamaList = () => {
                 setError('Please install MetaMask or another Ethereum-compatible wallet.');
                 return;
             }
-
+    
             await window.ethereum.request({ method: 'eth_requestAccounts' });
+    
             const provider = new ethers.providers.Web3Provider(window.ethereum);
             const signer = provider.getSigner();
             const amountInEther = ethers.utils.parseEther(contributionAmount);
-
+    
             if (amountInEther.isZero()) {
                 setError('Contribution amount is too small');
                 return;
             }
-
+    
             if (!selectedChama) {
                 setError('No chama selected.');
                 return;
             }
-
-            const chamaAddress = selectedChama.contractAddress;
+    
+            const chamaAddress = selectedChama.contractAddress; // Ensure this property is available
             if (!chamaAddress) {
                 setError('Chama contract address not found.');
                 return;
             }
-
+    
+            console.log("Selected Chama Address:", chamaAddress);
+            console.log("Contribution Amount in Ether:", amountInEther.toString());
+    
             const chamaContract = new ethers.Contract(chamaAddress, ContractAbi, signer);
             const tx = await chamaContract.contributeToChama({ value: amountInEther });
             await tx.wait();
-
+    
+            console.log('Transaction successful:', tx);
             setContributionAmount('');
             setShowContributionModal(false);
         } catch (error) {
+            console.error("Error during contribution:", error);
             setError(error.message);
         }
     };
+    
 
     const isMember = (chama, userAddress) => {
         return chama.listOfMembers.includes(userAddress);
@@ -132,37 +141,38 @@ const ChamaList = () => {
                     <p>No chamas found.</p>
                 ) : (
                     <div style={styles.cardContainer}>
-                        {chamas.map((chama, index) => (
-                            <div key={index} style={styles.card}>
-                                <h3>{chama.name}</h3>
-                                <p>Max Members: {chama.maxNoOfPeople.toString()}</p>
-                                <p>Visibility: {chama.visibility === 0 ? 'Public' : 'Private'}</p>
-                                <p>Owner: {chama.owner}</p>
-                                <p>Target Amount per Round: {ethers.utils.formatEther(chama.targetAmountPerRound.toString())} ETH</p>
-                                <p>Total Contribution: {ethers.utils.formatEther(chama.totalContribution.toString())} ETH</p>
-                                <p>Number of Rounds: {chama.numberOfRounds.toString()}</p>
-                                <p>Minimum Members: {chama.minimumNoOfPeople.toString()}</p>
-                                <p>Has Contribution Started: {chama.hasContributionStarted ? 'Yes' : 'No'}</p>
-                                <p>Current Round: {chama.currentRound.toString()}</p>
-                                {!isMember(chama, userAddress) && (
-                                    <>
-                                        {chama.visibility === 0 ? (
-                                            <button style={styles.button} onClick={() => handleJoinChama(chama.name)}>Join Chama</button>
-                                        ) : (
-                                            <button style={styles.button} onClick={() => handleAddMemberToPrivateChama(chama.name, userAddress)}>
-                                                Add Me to Private Chama
-                                            </button>
-                                        )}
-                                    </>
-                                )}
-                                {isMember(chama, userAddress) && !chama.hasContributionStarted && !isContributionStarted && (
-                                    <button style={styles.button} onClick={() => handleContributeFunds(chama.name)}>
-                                        Contribute Funds
-                                    </button>
-                                )}
-                                <button style={styles.button} onClick={() => setSelectedChama(chama)}>Select Chama</button>
-                            </div>
-                        ))}
+                       {chamas.map((chama, index) => (
+    <div key={index} style={styles.card}>
+        <h3>{chama.name}</h3>
+        <p>Max Members: {chama.maxNoOfPeople.toString()}</p>
+        <p>Visibility: {chama.visibility === 0 ? 'Public' : 'Private'}</p>
+        <p>Owner: {chama.owner}</p>
+        <p>Target Amount per Round: {ethers.utils.formatEther(chama.targetAmountPerRound.toString())} ETH</p>
+        <p>Total Contribution: {ethers.utils.formatEther(chama.totalContribution.toString())} ETH</p>
+        <p>Number of Rounds: {chama.numberOfRounds.toString()}</p>
+        <p>Minimum Members: {chama.minimumNoOfPeople.toString()}</p>
+        <p>Has Contribution Started: {chama.hasContributionStarted ? 'Yes' : 'No'}</p>
+        <p>Current Round: {chama.currentRound.toString()}</p>
+        {!isMember(chama, userAddress) && (
+            <>
+                {chama.visibility === 0 ? (
+                    <button style={styles.button} onClick={() => handleJoinChama(chama.name)}>Join Chama</button>
+                ) : (
+                    <button style={styles.button} onClick={() => handleAddMemberToPrivateChama(chama.name, userAddress)}>
+                        Add Me to Private Chama
+                    </button>
+                )}
+            </>
+        )}
+        {isMember(chama, userAddress) && !chama.hasContributionStarted && !isContributionStarted && (
+            <button style={styles.button} onClick={() => handleContributeFunds(chama.name)}>
+                Contribute Funds
+            </button>
+        )}
+        <button style={styles.button} onClick={() => setSelectedChama(chama)}>Select Chama</button>
+    </div>
+))}
+
                     </div>
                 )}
             </div>
