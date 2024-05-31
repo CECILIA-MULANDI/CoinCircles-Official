@@ -143,6 +143,9 @@ const ChamaList = () => {
                 return;
             }
     
+            // Get the chama name from the selectedChama object
+            const chamaName = selectedChama.name;
+    
             // Get the contract address of the selectedChama
             const chamaAddress = selectedChama.contractAddress;
             if (!chamaAddress) {
@@ -163,8 +166,8 @@ const ChamaList = () => {
                 return;
             }
     
-            // Call the method
-            const tx = await chamaContract[methodName]({ value: amountInEther });
+            // Call the method with the chama name and amount in ether
+            const tx = await chamaContract[methodName](chamaName, { value: amountInEther });
             await tx.wait();
     
             console.log('Transaction successful:', tx);
