@@ -156,14 +156,36 @@ const ChamaList = () => {
         return contributionInKsh.toFixed(2);
     };
 
-    const hasContributedInCurrentRound = (chamaId, userAddress) => {
-        const chama = chamas.find(c => c.id === chamaId);
-        if (!chama || !chama.contributionsPerRound) {
-            return false; // Return false if chama or contributionsPerRound is undefined
+    const hasContributedInCurrentRound = async (chamaId, userAddress) => {
+        try {
+            const chama = chamas.find(c => c.id === chamaId);
+            if (!chama) {
+                return false; // Return false if chama is undefined
+            }
+    
+            const chamaAddress = chama.contractAddress;
+            if (!chamaAddress) {
+                setError('Chama contract address not found.');
+                return false;
+            }
+    
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const signer = provider.getSigner();
+            const chamaContract = new ethers.Contract(chamaAddress, ContractAbi, signer);
+    
+            const methodName = 'hasContributedInCurrentRound';
+            if (!chamaContract[methodName]) {
+                setError(`Method ${methodName} not found in the contract.`);
+                return false;
+            }
+    
+            const hasContributed = await chamaContract[methodName](chamaId, userAddress);
+            return hasContributed;
+        } catch (error) {
+            console.error('Error checking contribution status:', error);
+            setError(error.message);
+            return false;
         }
-        const currentRound = chama.currentRound;
-        const userContributions = chama.contributionsPerRound[userAddress] || {};
-        return !!userContributions[currentRound];
     };
 
     if (loading) {
