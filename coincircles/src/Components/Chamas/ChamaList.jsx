@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getAllChamas, addMemberToPrivateChama, joinChama, isMinimumNumberOfPeopleReached, getContributionAmount } from '../CallContractFunctions/CallContract';
+import { getAllChamas, add_members_to_privatechama, join_chama, isMinimumNumberOfPeopleReached, getContributionAmount } from '../CallContractFunctions/CallContract';
 import { ethers } from 'ethers';
 import AvailableNavBar from '../NavBar/AvailableNavbar';
 import ContractAbi from "../../artifacts/contracts/Lock.sol/CoinCircles.json";
@@ -49,7 +49,7 @@ const ChamaList = () => {
 
     const handleJoinChama = async (chamaName) => {
         try {
-            await joinChama(chamaName);
+            await join_chama(chamaName);
         } catch (error) {
             setError(error.message);
         }
@@ -57,7 +57,7 @@ const ChamaList = () => {
 
     const handleAddMemberToPrivateChama = async (chamaName, newMember) => {
         try {
-            await addMemberToPrivateChama(chamaName, newMember);
+            await add_members_to_privatechama(chamaName, newMember);
         } catch (error) {
             setError(error.message);
         }
@@ -86,7 +86,6 @@ const ChamaList = () => {
         }
     };
     
-
     const handleContribution = async () => {
         try {
             // Check if MetaMask or another Ethereum-compatible wallet is installed
@@ -145,6 +144,13 @@ const ChamaList = () => {
         }
     };
 
+    const hasContributedInCurrentRound = async (chamaName) => {
+        // Call the contract function to check if the user has contributed in the current round
+        const chamaId = await contractInstance.methods.getChamaId(chamaName).call();
+        const hasContributed = await contractInstance.methods.hasContributedInCurrentRound(chamaId, userAddress).call();
+        return hasContributed;
+    };
+
     const isMember = (chama, userAddress) => {
         return chama.listOfMembers.includes(userAddress);
     };
@@ -168,7 +174,7 @@ const ChamaList = () => {
             <AvailableNavBar />
             <div style={styles.page}>
                 <h2 style={styles.heading}>Available Chamas</h2>
-                {chamas.length === 0 ? (
+                {chamas.length === 0? (
                     <p>No chamas found.</p>
                 ) : (
                     <div style={styles.cardContainer}>
@@ -183,7 +189,6 @@ const ChamaList = () => {
                                 <p>Number of Rounds: {chama.numberOfRounds.toString()}</p>
                                 <p>Minimum Members: {chama.minimumNoOfPeople.toString()}</p>
                                 <p>Has Contribution Started: {chama.hasContributionStarted ? 'Yes' : 'No'}</p>
-                                <p>Current Round: {chama.currentRound.toString()}</p>
                                 {!isMember(chama, userAddress) && (
                                     <>
                                         {chama.visibility === 0 ? (
@@ -195,10 +200,10 @@ const ChamaList = () => {
                                         )}
                                     </>
                                 )}
-                               {isMember(chama, userAddress) && !contributionStatus[chama.name] && (
-    <button style={styles.button} onClick={() => handleContributeFunds(chama.name)}>
-        Contribute Funds
-    </button>
+                                {isMember(chama, userAddress) && !hasContributedInCurrentRound(chama.name, userAddress) && !chama.hasContributionStarted && !isContributionStarted && (
+                                    <button style={styles.button} onClick={() => handleContributeFunds(chama.name)}>
+                                        Contribute Funds
+                                    </button>
                                 )}
                                 <button style={styles.button} onClick={() => handleSelectChama(chama.name)}>Select Chama</button>
                             </div>
@@ -282,7 +287,5 @@ const styles = {
     },
 };
 
-export default ChamaList;;
+export default ChamaList;
 
-
-           
