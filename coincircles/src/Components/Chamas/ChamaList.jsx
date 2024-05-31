@@ -77,6 +77,7 @@ const ChamaList = () => {
                 setError('Minimum number of members required for contributions has not been reached');
                 return;
             }
+            const hasUserContributed = userContributions[selectedChama.name] && userContributions[selectedChama.name].includes(userAddress);
 
             const contributionAmount = await getContributionAmount(chamaName);
             setContributionAmount(ethers.utils.formatEther(contributionAmount));
