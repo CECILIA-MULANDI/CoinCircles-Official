@@ -126,7 +126,10 @@ const ChamaList = () => {
       
           // Check if the user has already contributed in the current round
           const hasUserContributed = userContributions[selectedChama.name]?.includes(userAddress) || false;
-          console.log(hasUserContributed)
+          
+          console.log("hasUserContributed:", hasUserContributed);
+console.log("selectedChama:", selectedChama);
+console.log("userContributions:", userContributions);
           if (hasUserContributed===true) {
             setError('You have already contributed in the current round.');
             return;
