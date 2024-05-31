@@ -16,11 +16,13 @@ const ChamaList = () => {
     const [showContributionModal, setShowContributionModal] = useState(false);
     const [selectedChama, setSelectedChama] = useState(null);
     const [contributedUsers, setContributedUsers] = useState({});
+
     const handleSelectChama = (chamaName) => {
         const selectedChama = chamas.find(chama => chama.name === chamaName);
         setSelectedChama(selectedChama);
         console.log('Selected Chama:', selectedChama.name);
     };
+
     useEffect(() => {
         const fetchChamas = async () => {
             try {
@@ -181,96 +183,96 @@ const ChamaList = () => {
                                         {chama.visibility === 0 ? (
                                             <button style={styles.button} onClick={() => handleJoinChama(chama.name)}>Join Chama</button>
                                         ) : (
-                                            <button style={styles.button} onClick={() => handleAddMemberToPrivateChama(chama.name, userAddress)}>
-                                            Add Me to Private Chama
-                                        </button>
-                                    )}
-                                </>
-                            )}
-                            {isMember(chama, userAddress) && chama.minimumNoOfPeople <= chama.listOfMembers.length && (
-                                <button style={styles.button} onClick={() => handleContributeFunds(chama.name)}>
-                                    Contribute Funds
-                                </button>
-                            )}
-                            <button style={styles.button} onClick={() => handleSelectChama(chama.name)}>Select Chama</button>
-                        </div>
-                    ))}
+                                                <button style={styles.button} onClick={() => handleAddMemberToPrivateChama(chama.name, userAddress)}>
+                                                    Add Me to Private Chama
+                                                </button>
+                                            )}
+                                    </>
+                                )}
+                                {isMember(chama, userAddress) && chama.minimumNoOfPeople <= chama.listOfMembers.length && (
+                                    <button style={styles.button} onClick={() => handleContributeFunds(chama.name)}>
+                                        Contribute Funds
+                                    </button>
+                                )}
+                                <button style={styles.button} onClick={() => handleSelectChama(chama.name)}>Select Chama</button>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+            {showContributionModal && (
+                <div style={styles.modal}>
+                    <div style={styles.modalContent}>
+                        <h3>Contribution Amount</h3>
+                        <p>Your contribution amount is {contributionAmount} ETH.</p>
+                        <input
+                            type="text"
+                            value={contributionAmount}
+                            onChange={(e) => setContributionAmount(e.target.value)}
+                            placeholder="Enter contribution amount"
+                        />
+                        <button style={styles.button} onClick={() => handleContribution()}>
+                            Contribute
+                        </button>
+                        <button style={styles.button} onClick={() => setShowContributionModal(false)}>
+                            Cancel
+                        </button>
+                    </div>
                 </div>
             )}
-        </div>
-        {showContributionModal && (
-            <div style={styles.modal}>
-                <div style={styles.modalContent}>
-                    <h3>Contribution Amount</h3>
-                    <p>Your contribution amount is {contributionAmount} ETH.</p>
-                    <input
-                        type="text"
-                        value={contributionAmount}
-                        onChange={(e) => setContributionAmount(e.target.value)}
-                        placeholder="Enter contribution amount"
-                    />
-                    <button style={styles.button} onClick={() => handleContribution()}>
-                        Contribute
-                    </button>
-                    <button style={styles.button} onClick={() => setShowContributionModal(false)}>
-                        Cancel
-                    </button>
-                </div>
-            </div>
-        )}
-    </>
-);
+        </>
+    );
 };
 
 const styles = {
-page: {
-    backgroundColor: '#0a253b',
-    padding: '20px',
-},
-heading: {
-    textAlign: 'center',
-    color: 'white',
-},
-cardContainer: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    gap: '20px',
-    justifyContent: 'center',
-},
-card: {
-    backgroundColor: 'white',
-    color: 'black',
-    padding: '20px',
-    borderRadius: '20px',
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-    width: '400px',
-},
-button: {
-    backgroundColor: '#1fc1c3',
-    color: 'white',
-    padding: '10px',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    margin: '5px',
-},
-modal: {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-},
-modalContent: {
-    backgroundColor: 'white',
-    padding: '20px',
-    borderRadius: '10px',
-    textAlign: 'center',
-},
+    page: {
+        backgroundColor: '#0a253b',
+        padding: '20px',
+    },
+    heading: {
+        textAlign: 'center',
+        color: 'white',
+    },
+    cardContainer: {
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: '20px',
+        justifyContent: 'center',
+    },
+    card: {
+        backgroundColor: 'white',
+        color: 'black',
+        padding: '20px',
+        borderRadius: '20px',
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+        width: '400px',
+    },
+    button: {
+        backgroundColor: '#1fc1c3',
+        color: 'white',
+        padding: '10px',
+        border: 'none',
+        borderRadius: '5px',
+        cursor: 'pointer',
+        margin: '5px',
+    },
+    modal: {
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalContent: {
+        backgroundColor: 'white',
+        padding: '20px',
+        borderRadius: '10px',
+        textAlign: 'center',
+    },
 };
 
 export default ChamaList;
