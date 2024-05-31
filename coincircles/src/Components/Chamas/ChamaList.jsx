@@ -70,21 +70,22 @@ const ChamaList = () => {
                 setError('Selected Chama does not exist.');
                 return;
             }
-
-            const isMinimumReached = await isMinimumNumberOfPeopleReached(chamaName);
-            if (isMinimumReached) {
+    
+            // Check if the current user is the owner (first person)
+            if (selected.owner !== userAddress) {
                 setIsContributionStarted(true);
                 const contributionAmount = await getContributionAmount(chamaName);
                 setContributionAmount(ethers.utils.formatEther(contributionAmount));
                 setSelectedChama(selected); // Update selectedChama state
                 setShowContributionModal(true);
             } else {
-                setError('Minimum number of members required for contributions has not been reached');
+                setError('Only members can contribute.');
             }
         } catch (error) {
             setError(error.message);
         }
     };
+    
 
     const handleContribution = async () => {
         try {
