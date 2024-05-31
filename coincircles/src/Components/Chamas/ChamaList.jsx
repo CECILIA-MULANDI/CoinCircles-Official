@@ -209,16 +209,12 @@ const ChamaList = () => {
                 )}
             </>
         )}
-        {isMember(chama, userAddress) && !chama.hasContributionStarted && !isContributionStarted && (
-            <button style={styles.button} onClick={() => handleContributeFunds(chama.name)}>
-                Contribute Funds
-            </button>
-        )}
         {isMember(chama, userAddress) && !contributionStatus[chama.name] && !chama.hasContributionStarted && !isContributionStarted && (
-            <button style={styles.button} onClick={() => handleContributeFunds(chama.name)}>
-                Contribute Funds
-            </button>
-        )}
+    <button style={styles.button} onClick={() => handleContributeFunds(chama.name)}>
+        Contribute Funds
+    </button>
+)}
+        
         <button style={styles.button} onClick={() => handleSelectChama(chama.name)}>Select Chama</button>
     </div>
 ))}
