@@ -15,7 +15,8 @@ const ChamaList = () => {
     const [contributionAmount, setContributionAmount] = useState('0');
     const [showContributionModal, setShowContributionModal] = useState(false);
     const [selectedChama, setSelectedChama] = useState(null);
-    const [contributedUsers, setContributedUsers] = useState({});
+    // Define user contributions state
+    const [userContributions, setUserContributions] = useState({});
 
     const handleSelectChama = (chamaName) => {
         const selectedChama = chamas.find(chama => chama.name === chamaName);
@@ -122,7 +123,7 @@ const ChamaList = () => {
           }
       
           // Check if the user has already contributed in the current round
-          const hasUserContributed = contributedUsers[selectedChama.name]?.includes(userAddress) || false;
+          const hasUserContributed = userContributions[selectedChama.name]?.includes(userAddress) || false;
           if (hasUserContributed) {
             setError('You have already contributed in the current round.');
             return;
@@ -132,7 +133,7 @@ const ChamaList = () => {
           await tx.wait();
       
           // Update contributed users for the selected chama
-          setContributedUsers(prevState => ({
+          setUserContributions(prevState => ({
             ...prevState,
             [selectedChama.name]: [...(prevState[selectedChama.name] || []), userAddress]
           }));
@@ -151,8 +152,7 @@ const ChamaList = () => {
       };
     const isMember = (chama, userAddress) => {
         const isInMemberList = chama.listOfMembers.includes(userAddress);
-        const hasContributed = contributedUsers[chama.name]?.includes(userAddress) || false;
-        console.log(hasContributed)
+        const hasContributed = userContributions[chama.name]?.includes(userAddress) || false;
         return isInMemberList || hasContributed;
     };
 
@@ -185,7 +185,7 @@ const ChamaList = () => {
                                 <p>Max Members: {chama.maxNoOfPeople.toString()}</p>
                                 <p>Visibility: {chama.visibility === 0 ? 'Public' : 'Private'}</p>
                                 <p>Owner: {chama.owner}</p>
-                                <p>Target Amount per Round: {ethers.utils.formatEther(chama.targetAmountPerRound.toString())} ETH</p>
+                                <p>Target Amountper Round: {ethers.utils.formatEther(chama.targetAmountPerRound.toString())} ETH</p>
                                 <p>Total Contribution: {ethers.utils.formatEther(chama.totalContribution.toString())} ETH</p>
                                 <p>Number of Rounds: {chama.numberOfRounds.toString()}</p>
                                 <p>Minimum Members: {chama.minimumNoOfPeople.toString()}</p>
