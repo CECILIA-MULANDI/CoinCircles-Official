@@ -195,7 +195,7 @@ const ChamaList = () => {
                                     </>
                                 )}
                                {isMember(chama, userAddress) && !contributionStatus[chama.name] && (
-    <button style={styles.button} onClick={() => handleContributeFunds(chama.name)}>
+    <button style={styles.button} onClick={() => handleContributeFunds(chama)}>
         Contribute Funds
     </button>
                                 )}
