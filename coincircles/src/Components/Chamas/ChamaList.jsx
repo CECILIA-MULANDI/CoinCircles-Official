@@ -16,9 +16,10 @@ const ChamaList = () => {
 
     const [showContributionModal, setShowContributionModal] = useState(false);
     const [selectedChama, setSelectedChama] = useState(null);
-    const handleSelectChama = (chama) => {
-        setSelectedChama(chama);
-        // console.log('Selected Chama:', selectedChama.name);
+    const handleSelectChama = (chamaName) => {
+        const selectedChama = chamas.find(chama => chama.name === chamaName);
+        setSelectedChama(selectedChama);
+        console.log('Selected Chama:', selectedChama.name);
     };
     useEffect(() => {
         if(selectedChama) {
