@@ -158,21 +158,31 @@ const ChamaList = () => {
 
     const hasContributedInCurrentRound = async (chamaId, userAddress) => {
         try {
+            // Find the chama with the given chamaId
             const chama = chamas.find(c => c.id === chamaId);
+    
+            // If chama is not found, return false
             if (!chama) {
-                return false; // Return false if chama is undefined
+                return false;
             }
     
+            // Retrieve the chama contract address
             const chamaAddress = chama.contractAddress;
+    
+            // If chama contract address is not found, set an error and return false
             if (!chamaAddress) {
                 setError('Chama contract address not found.');
                 return false;
             }
     
+            // Create a Web3Provider and signer
             const provider = new ethers.providers.Web3Provider(window.ethereum);
             const signer = provider.getSigner();
+    
+            // Create a contract instance
             const chamaContract = new ethers.Contract(chamaAddress, ContractAbi, signer);
     
+            // Check if the contract method exists
             const methodName = 'hasContributedInCurrentRound';
             if (!chamaContract[methodName]) {
                 setError(`Method ${methodName} not found in the contract.`);
@@ -182,14 +192,19 @@ const ChamaList = () => {
             // Convert chamaId to BigNumber before passing it to the contract
             const chamaIdBigNumber = ethers.BigNumber.from(chamaId);
     
+            // Call the contract method to check if the user has contributed in the current round
             const hasContributed = await chamaContract[methodName](chamaIdBigNumber, userAddress);
+    
+            // Return the result
             return hasContributed;
         } catch (error) {
+            // Log and set an error message if an error occurs
             console.error('Error checking contribution status:', error);
             setError(error.message);
             return false;
         }
     };
+    
 
     if (loading) {
         return <div>Loading...</div>;
