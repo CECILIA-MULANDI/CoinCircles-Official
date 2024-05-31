@@ -130,26 +130,26 @@ const ChamaList = () => {
             console.log("Selected Chama Address:", chamaAddress);
             console.log("Contribution Amount in Ether:", amountInEther.toString());
             console.log("Contribution Amount:", contributionAmount);
-
+    
             const chamaContract = new ethers.Contract(chamaAddress, ContractAbi, signer);
-
+    
             // Verify that the method exists in the contract
             const methodName = 'contributeFunds';
             if (!chamaContract[methodName]) {
                 setError(`Method ${methodName} not found in the contract.`);
                 return;
             }
-
+    
             // Call the method with the chama name and amount in ether
             const tx = await chamaContract[methodName](chamaName, { value: amountInEther });
             await tx.wait();
-
-            // Update contribution status for the chama
+    
+            // Update contribution status for the chama only if it's not already true
             setContributionStatus(prevStatus => ({
                 ...prevStatus,
-                [chamaName]: true
+                [chamaName]: prevStatus[chamaName] || true
             }));
-
+    
             console.log('Transaction successful:', tx);
             setContributionAmount('');
             setShowContributionModal(false);
@@ -158,6 +158,7 @@ const ChamaList = () => {
             setError(error.message);
         }
     };
+    
 
     const isMember = (chama, userAddress) => {
         return chama.listOfMembers.includes(userAddress);
