@@ -11,21 +11,33 @@ const ChamaList = () => {
     const [error, setError] = useState(null);
     const [userAddress, setUserAddress] = useState(null);
     const [isContributionStarted, setIsContributionStarted] = useState(false);
+    // const [contributionAmount, setContributionAmount] = useState('');
     const [contributionAmount, setContributionAmount] = useState('0');
+
     const [showContributionModal, setShowContributionModal] = useState(false);
     const [selectedChama, setSelectedChama] = useState(null);
-    const [contributionStatus, setContributionStatus] = useState({});
-
+    const handleSelectChama = (chamaName) => {
+        const selectedChama = chamas.find(chama => chama.name === chamaName);
+        setSelectedChama(selectedChama);
+        console.log('Selected Chama:', selectedChama.name);
+    };
     useEffect(() => {
+        if(selectedChama) {
+            console.log('Selected Chama:', selectedChama.name);
+        }
         const fetchChamas = async () => {
             try {
                 const chamaDetails = await getAllChamas();
+                console.log('Chamas fetched:', chamaDetails); // Log the fetched details
+        
+                // Ensure each chama object includes the contractAddress property
                 const chamasWithContractAddress = chamaDetails.map(chama => ({
                     ...chama,
-                    contractAddress: contractAddress
+                    contractAddress: '0x13B33BEd26F4c0819110B86c1B621fa0407e5B31' // Replace with actual contract address
                 }));
+        
                 setChamas(chamasWithContractAddress);
-
+        
                 const provider = new ethers.providers.Web3Provider(window.ethereum);
                 const signer = provider.getSigner();
                 const address = await signer.getAddress();
@@ -36,15 +48,11 @@ const ChamaList = () => {
                 setLoading(false);
             }
         };
-
+        
+    
         fetchChamas();
     }, []);
-
-    const handleSelectChama = (chamaName) => {
-        const selectedChama = chamas.find(chama => chama.name === chamaName);
-        setSelectedChama(selectedChama);
-        console.log('Selected Chama:', selectedChama.name);
-    };
+    
 
     const handleJoinChama = async (chamaName) => {
         try {
@@ -62,6 +70,28 @@ const ChamaList = () => {
         }
     };
 
+    // const handleContributeFunds = async (chamaName) => {
+    //     try {
+    //         const selected = chamas.find(chama => chama.name === chamaName);
+    //         if (!selected) {
+    //             setError('Selected Chama does not exist.');
+    //             return;
+    //         }
+            
+    //         const isMinimumReached = await isMinimumNumberOfPeopleReached(chamaName);
+    //         if (isMinimumReached) {
+    //             setIsContributionStarted(true);
+    //             const contributionAmount = await getContributionAmount(chamaName);
+    //             setContributionAmount(ethers.utils.formatEther(contributionAmount));
+    //             setSelectedChama(selected); // Update selectedChama state
+    //             setShowContributionModal(true);
+    //         } else {
+    //             setError('Minimum number of members required for contributions has not been reached');
+    //         }
+    //     } catch (error) {
+    //         setError(error.message);
+    //     }
+    // };
     const handleContributeFunds = async (chamaName) => {
         try {
             const selected = chamas.find(chama => chama.name === chamaName);
@@ -70,16 +100,16 @@ const ChamaList = () => {
                 return;
             }
     
-            // Check if the current user is the owner (first person)
-            if (selected.owner !== userAddress) {
-                setIsContributionStarted(true);
-                const contributionAmount = await getContributionAmount(chamaName);
-                setContributionAmount(ethers.utils.formatEther(contributionAmount));
-                setSelectedChama(selected); // Update selectedChama state
-                setShowContributionModal(true);
-            } else {
-                setError('Only members can contribute.');
+            const isMinimumReached = await isMinimumNumberOfPeopleReached(chamaName);
+            if (!isMinimumReached) {
+                setError('Minimum number of members required for contributions has not been reached');
+                return;
             }
+    
+            const contributionAmount = await getContributionAmount(chamaName);
+            setContributionAmount(ethers.utils.formatEther(contributionAmount));
+            setSelectedChama(selected);
+            setShowContributionModal(true);
         } catch (error) {
             setError(error.message);
         }
@@ -92,48 +122,54 @@ const ChamaList = () => {
                 setError('Please install MetaMask or another Ethereum-compatible wallet.');
                 return;
             }
-
+    
             // Request account access from the user
             await window.ethereum.request({ method: 'eth_requestAccounts' });
-
+    
             // Create a provider and signer using the Web3Provider
             const provider = new ethers.providers.Web3Provider(window.ethereum);
             const signer = provider.getSigner();
-
+    
             // Parse contributionAmount into Ether
             if (!contributionAmount || isNaN(parseFloat(contributionAmount))) {
                 setError('Invalid contribution amount.');
                 return;
             }
             const amountInEther = ethers.utils.parseEther(contributionAmount);
-
+    
             // Check if selectedChama is valid
             if (!selectedChama) {
                 setError('No chama selected.');
                 return;
             }
-
+    
+            // Get the chama name from the selectedChama object
             const chamaName = selectedChama.name;
+    
+            // Get the contract address of the selectedChama
             const chamaAddress = selectedChama.contractAddress;
             if (!chamaAddress) {
                 setError('Chama contract address not found.');
                 return;
             }
-
+    
+            console.log("Selected Chama Address:", chamaAddress);
+            console.log("Contribution Amount in Ether:", amountInEther.toString());
+            console.log("Contribution Amount:", contributionAmount);
+    
             const chamaContract = new ethers.Contract(chamaAddress, ContractAbi, signer);
+    
+            // Verify that the method exists in the contract
             const methodName = 'contributeFunds';
             if (!chamaContract[methodName]) {
                 setError(`Method ${methodName} not found in the contract.`);
                 return;
             }
-
+    
+            // Call the method with the chama name and amount in ether
             const tx = await chamaContract[methodName](chamaName, { value: amountInEther });
             await tx.wait();
-
-            setContributionStatus(prevStatus => ({
-                ...prevStatus,
-                [chamaName]: prevStatus[chamaName] || true
-            }));
+    
             console.log('Transaction successful:', tx);
             setContributionAmount('');
             setShowContributionModal(false);
@@ -142,16 +178,66 @@ const ChamaList = () => {
             setError(error.message);
         }
     };
+    
+    
+    
 
-    const hasContributedInCurrentRound = async (chamaName) => {
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-const signer = provider.getSigner();
-const contractInstance = new ethers.Contract(contractAddress, ContractAbi, signer);
-        // Call the contract function to check if the user has contributed in the current round
-        const chamaId = await contractInstance.methods.getChamaId(chamaName).call();
-        const hasContributed = await contractInstance.methods.hasContributedInCurrentRound(chamaId, userAddress).call();
-        return hasContributed;
-    };
+    // const handleContribution = async () => {
+    //     try {
+    //         if (!window.ethereum) {
+    //             setError('Please install MetaMask or another Ethereum-compatible wallet.');
+    //             return;
+    //         }
+    
+    //         await window.ethereum.request({ method: 'eth_requestAccounts' });
+    
+    //         const provider = new ethers.providers.Web3Provider(window.ethereum);
+    //         const signer = provider.getSigner();
+    //         const amountInEther = ethers.utils.parseEther(contributionAmount);
+    
+    //         if (amountInEther.isZero()) {
+    //             setError('Contribution amount is too small');
+    //             return;
+    //         }
+    
+    //         if (!selectedChama) {
+    //             setError('No chama selected.');
+    //             return;
+    //         }
+    
+    //         const chamaAddress = selectedChama.contractAddress;
+    //         if (!chamaAddress) {
+    //             setError('Chama contract address not found.');
+    //             return;
+    //         }
+    //         console.log("chama selected");
+    
+    //         console.log("Selected Chama Address:", chamaAddress);
+    //         console.log("Contribution Amount in Ether:", amountInEther.toString());
+    
+    //         const chamaContract = new ethers.Contract(chamaAddress, ContractAbi, signer);
+    
+    //         // Verify that the method exists in the contract
+    //         const methodName = 'contributeFunds';
+    //         if (!chamaContract[methodName]) {
+    //             setError(`Method ${methodName} not found in the contract.`);
+    //             return;
+    //         }
+    
+    //         // Call the method
+    //         const tx = await chamaContract[methodName]({ value: amountInEther });
+    //         await tx.wait();
+    
+    //         console.log('Transaction successful:', tx);
+    //         setContributionAmount('');
+    //         setShowContributionModal(false);
+    //     } catch (error) {
+    //         console.error("Error during contribution:", error);
+    //         setError(error.message);
+    //     }
+    // };
+    
+    
 
     const isMember = (chama, userAddress) => {
         return chama.listOfMembers.includes(userAddress);
@@ -176,40 +262,42 @@ const contractInstance = new ethers.Contract(contractAddress, ContractAbi, signe
             <AvailableNavBar />
             <div style={styles.page}>
                 <h2 style={styles.heading}>Available Chamas</h2>
-                {chamas.length === 0? (
+                {chamas.length === 0 ? (
                     <p>No chamas found.</p>
                 ) : (
                     <div style={styles.cardContainer}>
-                        {chamas.map((chama, index) => (
-                            <div key={index} style={styles.card}>
-                                <h3>{chama.name}</h3>
-                                <p>Max Members: {chama.maxNoOfPeople.toString()}</p>
-                                <p>Visibility: {chama.visibility === 0 ? 'Public' : 'Private'}</p>
-                                <p>Owner: {chama.owner}</p>
-                                <p>Target Amount per Round: {ethers.utils.formatEther(chama.targetAmountPerRound.toString())} ETH</p>
-                                <p>Total Contribution: {ethers.utils.formatEther(chama.totalContribution.toString())} ETH</p>
-                                <p>Number of Rounds: {chama.numberOfRounds.toString()}</p>
-                                <p>Minimum Members: {chama.minimumNoOfPeople.toString()}</p>
-                                <p>Has Contribution Started: {chama.hasContributionStarted ? 'Yes' : 'No'}</p>
-                                {!isMember(chama, userAddress) && (
-                                    <>
-                                        {chama.visibility === 0 ? (
-                                            <button style={styles.button} onClick={() => handleJoinChama(chama.name)}>Join Chama</button>
-                                        ) : (
-                                            <button style={styles.button} onClick={() => handleAddMemberToPrivateChama(chama.name, userAddress)}>
-                                                Add Me to Private Chama
-                                            </button>
-                                        )}
-                                    </>
-                                )}
-                                {isMember(chama, userAddress) && !hasContributedInCurrentRound(chama.name, userAddress) && !chama.hasContributionStarted && !isContributionStarted && (
-                                    <button style={styles.button} onClick={() => handleContributeFunds(chama.name)}>
-                                        Contribute Funds
-                                    </button>
-                                )}
-                                <button style={styles.button} onClick={() => handleSelectChama(chama.name)}>Select Chama</button>
-                            </div>
-                        ))}
+                       {chamas.map((chama, index) => (
+    <div key={index} style={styles.card}>
+        <h3>{chama.name}</h3>
+        <p>Max Members: {chama.maxNoOfPeople.toString()}</p>
+        <p>Visibility: {chama.visibility === 0 ? 'Public' : 'Private'}</p>
+        <p>Owner: {chama.owner}</p>
+        <p>Target Amount per Round: {ethers.utils.formatEther(chama.targetAmountPerRound.toString())} ETH</p>
+        <p>Total Contribution: {ethers.utils.formatEther(chama.totalContribution.toString())} ETH</p>
+        <p>Number of Rounds: {chama.numberOfRounds.toString()}</p>
+        <p>Minimum Members: {chama.minimumNoOfPeople.toString()}</p>
+        <p>Has Contribution Started: {chama.hasContributionStarted ? 'Yes' : 'No'}</p>
+        <p>Current Round: {chama.currentRound.toString()}</p>
+        {!isMember(chama, userAddress) && (
+            <>
+                {chama.visibility === 0 ? (
+                    <button style={styles.button} onClick={() => handleJoinChama(chama.name)}>Join Chama</button>
+                ) : (
+                    <button style={styles.button} onClick={() => handleAddMemberToPrivateChama(chama.name, userAddress)}>
+                        Add Me to Private Chama
+                    </button>
+                )}
+            </>
+        )}
+        {isMember(chama, userAddress) && chama.minimumNoOfPeople <= chama.listOfMembers.length && (
+    <button style={styles.button} onClick={() => handleContributeFunds(chama.name)}>
+        Contribute Funds
+    </button>
+)}
+        <button style={styles.button} onClick={() => handleSelectChama(chama.name)}>Select Chama</button>
+    </div>
+))}
+
                     </div>
                 )}
             </div>
@@ -274,7 +362,6 @@ const styles = {
         top: 0,
         left: 0,
         width: '100%',
-
         height: '100%',
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
         display: 'flex',
@@ -290,4 +377,3 @@ const styles = {
 };
 
 export default ChamaList;
-
