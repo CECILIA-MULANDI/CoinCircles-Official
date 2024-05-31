@@ -185,7 +185,7 @@ const ChamaList = () => {
                                 <h3>{chama.name}</h3>
                                 <p>Max Members: {chama.maxNoOfPeople.toString()}</p>
                                 <p>Visibility: {chama.visibility === 0 ? 'Public' : 'Private'}</p>
-                                <p>Owner: {chama.owner}</p>
+                                <p>Owner: {chama.owner?.toString() || 'N/A'}</p>
                                 <p>Target Amount per Round: {ethers.utils.formatEther(chama.targetAmountPerRound.toString())} ETH</p>
                                 <p>Total Contribution: {ethers.utils.formatEther(chama.totalContribution.toString())} ETH</p>
                                 <p>Number of Rounds: {chama.numberOfRounds.toString()}</p>
