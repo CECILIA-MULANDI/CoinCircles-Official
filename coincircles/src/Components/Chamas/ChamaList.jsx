@@ -179,7 +179,10 @@ const ChamaList = () => {
                 return false;
             }
     
-            const hasContributed = await chamaContract[methodName](chamaId, userAddress);
+            // Convert chamaId to BigNumber before passing it to the contract
+            const chamaIdBigNumber = ethers.BigNumber.from(chamaId);
+    
+            const hasContributed = await chamaContract[methodName](chamaIdBigNumber, userAddress);
             return hasContributed;
         } catch (error) {
             console.error('Error checking contribution status:', error);
