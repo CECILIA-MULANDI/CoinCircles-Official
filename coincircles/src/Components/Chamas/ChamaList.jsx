@@ -17,6 +17,8 @@ const ChamaList = () => {
     const [selectedChama, setSelectedChama] = useState(null);
     // Define user contributions state
     const [userContributions, setUserContributions] = useState({});
+    
+
 
     const handleSelectChama = (chamaName) => {
         const selectedChama = chamas.find(chama => chama.name === chamaName);
@@ -124,6 +126,7 @@ const ChamaList = () => {
       
           // Check if the user has already contributed in the current round
           const hasUserContributed = userContributions[selectedChama.name]?.includes(userAddress) || false;
+          console.log(hasUserContributed)
           if (hasUserContributed) {
             setError('You have already contributed in the current round.');
             return;
