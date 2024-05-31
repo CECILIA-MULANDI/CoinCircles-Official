@@ -125,7 +125,8 @@ const ChamaList = () => {
           }
       
           // Check if the user has already contributed in the current round
-          const hasUserContributed = userContributions[selectedChama.name]?.includes(userAddress) || false;
+          const hasUserContributed = userContributions[selectedChama.name] && userContributions[selectedChama.name].includes(userAddress);
+
           
           console.log("hasUserContributed:", hasUserContributed);
 console.log("selectedChama:", selectedChama);
