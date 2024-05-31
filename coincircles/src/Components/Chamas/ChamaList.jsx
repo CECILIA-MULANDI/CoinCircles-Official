@@ -162,10 +162,12 @@ const ChamaList = () => {
             const chama = chamas.find(c => c.id === chamaId);
     
             // If chama is not found, return false
-            if (!chama) {
+            if (!chamaId) {
+                setError('chamaId is undefined or null.');
                 return false;
             }
-    
+            
+            // const chamaIdBigNumber = ethers.BigNumber.from(chamaId);
             // Retrieve the chama contract address
             const chamaAddress = chama.contractAddress;
     
