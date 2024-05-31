@@ -173,11 +173,13 @@ const ChamaList = () => {
             console.log('Transaction successful:', tx);
             setContributionAmount('');
             setShowContributionModal(false);
+            setSelectedChama(null); // Reset selected chama
         } catch (error) {
             console.error("Error during contribution:", error);
             setError(error.message);
         }
     };
+    
     
     
     
