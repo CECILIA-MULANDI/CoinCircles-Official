@@ -158,6 +158,9 @@ const ChamaList = () => {
 
     const hasContributedInCurrentRound = (chamaId, userAddress) => {
         const chama = chamas.find(c => c.id === chamaId);
+        if (!chama || !chama.contributionsPerRound) {
+            return false; // Return false if chama or contributionsPerRound is undefined
+        }
         const currentRound = chama.currentRound;
         const userContributions = chama.contributionsPerRound[userAddress] || {};
         return !!userContributions[currentRound];

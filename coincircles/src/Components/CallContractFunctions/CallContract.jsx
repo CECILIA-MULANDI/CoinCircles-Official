@@ -149,6 +149,7 @@ export const disconnectWallet = (setWalletAddress) => {
       throw error;
     }
   };
+  
   export const isMinimumNumberOfPeopleReached = async (chamaName) => {
     try {
       const contract = await connectToContract();
