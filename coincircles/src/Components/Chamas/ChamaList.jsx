@@ -152,6 +152,7 @@ const ChamaList = () => {
     const isMember = (chama, userAddress) => {
         const isInMemberList = chama.listOfMembers.includes(userAddress);
         const hasContributed = contributedUsers[chama.name]?.includes(userAddress) || false;
+        console.log(hasContributed)
         return isInMemberList || hasContributed;
     };
 
