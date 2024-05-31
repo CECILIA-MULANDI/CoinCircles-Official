@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getAllChamas, addMemberToPrivateChama, joinChama, isMinimumNumberOfPeopleReached, getContributionAmount,hasUserContributed } from '../CallContractFunctions/CallContract';
+import { getAllChamas, addMemberToPrivateChama, joinChama, isMinimumNumberOfPeopleReached, getContributionAmount } from '../CallContractFunctions/CallContract';
 import { ethers } from 'ethers';
 import AvailableNavBar from '../NavBar/AvailableNavbar';
 import ContractAbi from "../../artifacts/contracts/Lock.sol/CoinCircles.json";
@@ -85,7 +85,6 @@ const ChamaList = () => {
             setError(error.message);
         }
     };
-   
 
     const handleContribution = async () => {
         try {
@@ -195,10 +194,10 @@ const ChamaList = () => {
                                         )}
                                     </>
                                 )}
-                               {isMember(chama, userAddress) && !contributionStatus[chama.name] && !hasUserContributed(chama, userAddress) && (
-    <button style={styles.button} onClick={() => handleContributeFunds(chama.name)}>
-        Contribute Funds
-    </button>
+                                {isMember(chama, userAddress) && !contributionStatus[chama.name] && (
+                                <button style={styles.button} onClick={() => handleContributeFunds(chama.name)}>
+                                    Contribute Funds
+                                </button>
                                 )}
                                 <button style={styles.button} onClick={() => handleSelectChama(chama.name)}>Select Chama</button>
                             </div>
