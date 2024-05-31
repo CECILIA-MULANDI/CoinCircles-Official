@@ -140,7 +140,10 @@ const ChamaList = () => {
     };
 
     const isMember = (chama, userAddress) => {
-        return chama.listOfMembers.includes(userAddress);
+        return (
+            chama.listOfMembers.includes(userAddress) ||
+            (contributedUsers[chama.name] && contributedUsers[chama.name].includes(userAddress))
+        );
     };
 
     const formatContributionAmount = (amount) => {
