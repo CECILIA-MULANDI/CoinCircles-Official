@@ -3,37 +3,36 @@ import { getAllChamas, addMemberToPrivateChama, joinChama, isMinimumNumberOfPeop
 import { ethers } from 'ethers';
 import AvailableNavBar from '../NavBar/AvailableNavbar';
 import ContractAbi from "../../artifacts/contracts/Lock.sol/CoinCircles.json";
-// import { ContractAddress } from '../Constants/Constants';
-const contractAddress='0x13B33BEd26F4c0819110B86c1B621fa0407e5B31';
+
+const contractAddress = '0x13B33BEd26F4c0819110B86c1B621fa0407e5B31';
+
 const ChamaList = () => {
     const [chamas, setChamas] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [userAddress, setUserAddress] = useState(null);
     const [isContributionStarted, setIsContributionStarted] = useState(false);
-    // const [contributionAmount, setContributionAmount] = useState('');
     const [contributionAmount, setContributionAmount] = useState('0');
 
     const [showContributionModal, setShowContributionModal] = useState(false);
     const [selectedChama, setSelectedChama] = useState(null);
+    const [memberContributed, setMemberContributed] = useState(false); // Track contribution status for each member
+
     const handleSelectChama = (chamaName) => {
         const selectedChama = chamas.find(chama => chama.name === chamaName);
         setSelectedChama(selectedChama);
         console.log('Selected Chama:', selectedChama.name);
     };
+
     useEffect(() => {
-        if(selectedChama) {
-            console.log('Selected Chama:', selectedChama.name);
-        }
         const fetchChamas = async () => {
             try {
                 const chamaDetails = await getAllChamas();
-                console.log('Chamas fetched:', chamaDetails); // Log the fetched details
+                console.log('Chamas fetched:', chamaDetails);
         
-                // Ensure each chama object includes the contractAddress property
                 const chamasWithContractAddress = chamaDetails.map(chama => ({
                     ...chama,
-                    contractAddress: '0x13B33BEd26F4c0819110B86c1B621fa0407e5B31' // Replace with actual contract address
+                    contractAddress: '0x13B33BEd26F4c0819110B86c1B621fa0407e5B31'
                 }));
         
                 setChamas(chamasWithContractAddress);
@@ -48,11 +47,9 @@ const ChamaList = () => {
                 setLoading(false);
             }
         };
-        
     
         fetchChamas();
     }, []);
-    
 
     const handleJoinChama = async (chamaName) => {
         try {
@@ -70,28 +67,6 @@ const ChamaList = () => {
         }
     };
 
-    // const handleContributeFunds = async (chamaName) => {
-    //     try {
-    //         const selected = chamas.find(chama => chama.name === chamaName);
-    //         if (!selected) {
-    //             setError('Selected Chama does not exist.');
-    //             return;
-    //         }
-            
-    //         const isMinimumReached = await isMinimumNumberOfPeopleReached(chamaName);
-    //         if (isMinimumReached) {
-    //             setIsContributionStarted(true);
-    //             const contributionAmount = await getContributionAmount(chamaName);
-    //             setContributionAmount(ethers.utils.formatEther(contributionAmount));
-    //             setSelectedChama(selected); // Update selectedChama state
-    //             setShowContributionModal(true);
-    //         } else {
-    //             setError('Minimum number of members required for contributions has not been reached');
-    //         }
-    //     } catch (error) {
-    //         setError(error.message);
-    //     }
-    // };
     const handleContributeFunds = async (chamaName) => {
         try {
             const selected = chamas.find(chama => chama.name === chamaName);
@@ -117,36 +92,28 @@ const ChamaList = () => {
     
     const handleContribution = async () => {
         try {
-            // Check if MetaMask or another Ethereum-compatible wallet is installed
             if (!window.ethereum) {
                 setError('Please install MetaMask or another Ethereum-compatible wallet.');
                 return;
             }
     
-            // Request account access from the user
             await window.ethereum.request({ method: 'eth_requestAccounts' });
     
-            // Create a provider and signer using the Web3Provider
             const provider = new ethers.providers.Web3Provider(window.ethereum);
             const signer = provider.getSigner();
     
-            // Parse contributionAmount into Ether
             if (!contributionAmount || isNaN(parseFloat(contributionAmount))) {
                 setError('Invalid contribution amount.');
                 return;
             }
             const amountInEther = ethers.utils.parseEther(contributionAmount);
     
-            // Check if selectedChama is valid
             if (!selectedChama) {
                 setError('No chama selected.');
                 return;
             }
     
-            // Get the chama name from the selectedChama object
             const chamaName = selectedChama.name;
-    
-            // Get the contract address of the selectedChama
             const chamaAddress = selectedChama.contractAddress;
             if (!chamaAddress) {
                 setError('Chama contract address not found.');
@@ -159,87 +126,25 @@ const ChamaList = () => {
     
             const chamaContract = new ethers.Contract(chamaAddress, ContractAbi, signer);
     
-            // Verify that the method exists in the contract
             const methodName = 'contributeFunds';
             if (!chamaContract[methodName]) {
                 setError(`Method ${methodName} not found in the contract.`);
                 return;
             }
     
-            // Call the method with the chama name and amount in ether
             const tx = await chamaContract[methodName](chamaName, { value: amountInEther });
             await tx.wait();
     
             console.log('Transaction successful:', tx);
             setContributionAmount('');
             setShowContributionModal(false);
-            setSelectedChama(null); // Reset selected chama
+            setSelectedChama(null);
+            setMemberContributed(true); // Set contribution status for the current member to true
         } catch (error) {
             console.error("Error during contribution:", error);
             setError(error.message);
         }
     };
-    
-    
-    
-    
-
-    // const handleContribution = async () => {
-    //     try {
-    //         if (!window.ethereum) {
-    //             setError('Please install MetaMask or another Ethereum-compatible wallet.');
-    //             return;
-    //         }
-    
-    //         await window.ethereum.request({ method: 'eth_requestAccounts' });
-    
-    //         const provider = new ethers.providers.Web3Provider(window.ethereum);
-    //         const signer = provider.getSigner();
-    //         const amountInEther = ethers.utils.parseEther(contributionAmount);
-    
-    //         if (amountInEther.isZero()) {
-    //             setError('Contribution amount is too small');
-    //             return;
-    //         }
-    
-    //         if (!selectedChama) {
-    //             setError('No chama selected.');
-    //             return;
-    //         }
-    
-    //         const chamaAddress = selectedChama.contractAddress;
-    //         if (!chamaAddress) {
-    //             setError('Chama contract address not found.');
-    //             return;
-    //         }
-    //         console.log("chama selected");
-    
-    //         console.log("Selected Chama Address:", chamaAddress);
-    //         console.log("Contribution Amount in Ether:", amountInEther.toString());
-    
-    //         const chamaContract = new ethers.Contract(chamaAddress, ContractAbi, signer);
-    
-    //         // Verify that the method exists in the contract
-    //         const methodName = 'contributeFunds';
-    //         if (!chamaContract[methodName]) {
-    //             setError(`Method ${methodName} not found in the contract.`);
-    //             return;
-    //         }
-    
-    //         // Call the method
-    //         const tx = await chamaContract[methodName]({ value: amountInEther });
-    //         await tx.wait();
-    
-    //         console.log('Transaction successful:', tx);
-    //         setContributionAmount('');
-    //         setShowContributionModal(false);
-    //     } catch (error) {
-    //         console.error("Error during contribution:", error);
-    //         setError(error.message);
-    //     }
-    // };
-    
-    
 
     const isMember = (chama, userAddress) => {
         return chama.listOfMembers.includes(userAddress);
@@ -275,7 +180,7 @@ const ChamaList = () => {
         <p>Visibility: {chama.visibility === 0 ? 'Public' : 'Private'}</p>
         <p>Owner: {chama.owner}</p>
         <p>Target Amount per Round: {ethers.utils.formatEther(chama.targetAmountPerRound.toString())} ETH</p>
-        <p>Total Contribution: {ethers.utils.formatEther(chama.totalContribution.toString())} ETH</p>
+        <p>Total Contribution:{ethers.utils.formatEther(chama.totalContribution.toString())} ETH</p>
         <p>Number of Rounds: {chama.numberOfRounds.toString()}</p>
         <p>Minimum Members: {chama.minimumNoOfPeople.toString()}</p>
         <p>Has Contribution Started: {chama.hasContributionStarted ? 'Yes' : 'No'}</p>
@@ -291,11 +196,11 @@ const ChamaList = () => {
                 )}
             </>
         )}
-        {isMember(chama, userAddress) && chama.minimumNoOfPeople <= chama.listOfMembers.length && (
-    <button style={styles.button} onClick={() => handleContributeFunds(chama.name)}>
-        Contribute Funds
-    </button>
-)}
+        {isMember(chama, userAddress) && chama.minimumNoOfPeople <= chama.listOfMembers.length && !memberContributed && ( // Check if the member hasn't contributed yet
+            <button style={styles.button} onClick={() => handleContributeFunds(chama.name)}>
+                Contribute Funds
+            </button>
+        )}
         <button style={styles.button} onClick={() => handleSelectChama(chama.name)}>Select Chama</button>
     </div>
 ))}
@@ -379,3 +284,4 @@ const styles = {
 };
 
 export default ChamaList;
+
