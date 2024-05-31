@@ -4,7 +4,7 @@ import { ethers } from 'ethers';
 import AvailableNavBar from '../NavBar/AvailableNavbar';
 import ContractAbi from "../../artifacts/contracts/Lock.sol/CoinCircles.json";
 
-const contractAddress = '0x13B33BEd26F4c0819110B86c1B621fa0407e5B31';
+const contractAddress = '0xf7C728CED9D6a68E8e08f0aF136A34Cf617130B6';
 
 const ChamaList = () => {
     const [chamas, setChamas] = useState([]);
@@ -77,8 +77,8 @@ const ChamaList = () => {
                 setError('Minimum number of members required for contributions has not been reached');
                 return;
             }
-            const hasUserContributed = userContributions[selectedChama.name] && userContributions[selectedChama.name].includes(userAddress);
-
+            // const hasUserContributed = userContributions[selectedChama.name] && userContributions[selectedChama.name].includes(userAddress);
+            // console.log(hasUserContributed);
             const contributionAmount = await getContributionAmount(chamaName);
             setContributionAmount(ethers.utils.formatEther(contributionAmount));
             setSelectedChama(selected);
@@ -90,85 +90,84 @@ const ChamaList = () => {
 
     const handleContribution = async () => {
         try {
-          if (!window.ethereum) {
-            setError('Please install MetaMask or another Ethereum-compatible wallet.');
-            return;
-          }
-      
-          await window.ethereum.request({ method: 'eth_requestAccounts' });
-      
-          const provider = new ethers.providers.Web3Provider(window.ethereum);
-          const signer = provider.getSigner();
-          const amountInEther = ethers.utils.parseEther(contributionAmount);
-      
-          if (!amountInEther || isNaN(parseFloat(amountInEther))) {
-            setError('Invalid contribution amount.');
-            return;
-          }
-      
-          if (!selectedChama) {
-            setError('No chama selected.');
-            return;
-          }
-      
-          const chamaAddress = selectedChama.contractAddress;
-          if (!chamaAddress) {
-            setError('Chama contract address not found.');
-            return;
-          }
-      
-          const chamaContract = new ethers.Contract(chamaAddress, ContractAbi, signer);
-          const methodName = 'contributeFunds';
-      
-          if (!chamaContract[methodName]) {
-            setError(`Method ${methodName} not found in the contract.`);
-            return;
-          }
-      
-          // Check if the user has already contributed in the current round
-          const hasUserContributed = userContributions[selectedChama.name] && userContributions[selectedChama.name].includes(userAddress);
+            if (!window.ethereum) {
+                setError('Please install MetaMask or another Ethereum-compatible wallet.');
+                return;
+            }
 
-          
-          console.log("hasUserContributed:", hasUserContributed);
-console.log("selectedChama:", selectedChama);
-console.log("userContributions:", userContributions);
-          if (hasUserContributed) {
-            setError('You have already contributed in the current round.');
-            return;
-          }
-      
-          const tx = await chamaContract[methodName](selectedChama.name, { value: amountInEther });
-          await tx.wait();
-      
-          // Update contributed users for the selected chama
-          setUserContributions(prevState => ({
-            ...prevState,
-            [selectedChama.name]: [...(prevState[selectedChama.name] || []), userAddress]
-          }));
-      
-          setContributionAmount('');
-          setShowContributionModal(false);
-          setSelectedChama(null);
+            await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const signer = provider.getSigner();
+            const amountInEther = ethers.utils.parseEther(contributionAmount);
+
+            if (!amountInEther || isNaN(parseFloat(amountInEther))) {
+                setError('Invalid contribution amount.');
+                return;
+            }
+
+            if (!selectedChama) {
+                setError('No chama selected.');
+                return;
+            }
+
+            const chamaAddress = selectedChama.contractAddress;
+            if (!chamaAddress) {
+                setError('Chama contract address not found.');
+                return;
+            }
+
+            const chamaContract = new ethers.Contract(chamaAddress, ContractAbi, signer);
+            const methodName = 'contributeFunds';
+
+            if (!chamaContract[methodName]) {
+                setError(`Method ${methodName} not found in the contract.`);
+                return;
+            }
+
+            // Check if the user has already contributed in the current round
+            const hasUserContributedInCurrentRound = userContributions[selectedChama.name]?.[selectedChama.currentRound]?.includes(userAddress) || false;
+
+            if (hasUserContributedInCurrentRound) {
+                setError('You have already contributed in the current round.');
+                return;
+            }
+
+            const tx = await chamaContract[methodName](selectedChama.name, { value: amountInEther });
+            await tx.wait();
+
+            // Update contributed users for the selected chama and current round
+            setUserContributions(prevState => ({
+                ...prevState,
+                [selectedChama.name]: {
+                    ...(prevState[selectedChama.name] || {}),
+                    [selectedChama.currentRound]: [...(prevState[selectedChama.name]?.[selectedChama.currentRound] || []), userAddress]
+                }
+            }));
+
+            setContributionAmount('');
+            setShowContributionModal(false);
+            setSelectedChama(null);
         } catch (error) {
-          console.error("Error during contribution:", error);
-          if (error.data && error.data.originalError && error.data.originalError.message.includes('You have already contributed in the current round')) {
-            setError('You have already contributed in the current round.');
-          } else {
-            setError(error.message);
-          }
+            console.error("Error during contribution:", error);
+            if (error.data && error.data.originalError && error.data.originalError.message.includes('You have already contributed in the current round')) {
+                setError('You have already contributed in the current round.');
+            } else {
+                setError(error.message);
+            }
         }
-      };
+    };
     const isMember = (chama, userAddress) => {
         const isInMemberList = chama.listOfMembers.includes(userAddress);
-        const hasContributed = userContributions[chama.name]?.includes(userAddress) || false;
-        return isInMemberList || hasContributed;
+        const hasContributedInCurrentRound = userContributions[chama.name]?.[chama.currentRound]?.includes(userAddress) || false;
+        return isInMemberList || hasContributedInCurrentRound;
     };
 
-    const formatContributionAmount = (amount) => {
-        const ethToKsh = 200; // Replace with the appropriate exchange rate
-        const contributionInKsh = parseFloat(ethers.utils.formatEther(amount)) * ethToKsh;
-        return contributionInKsh.toFixed(2);
-    };
+    // const formatContributionAmount = (amount) => {
+    //     const ethToKsh = 200; // Replace with the appropriate exchange rate
+    //     const contributionInKsh = parseFloat(ethers.utils.formatEther(amount)) * ethToKsh;
+    //     return contributionInKsh.toFixed(2);
+    // };
 
     if (loading) {
         return <div>Loading...</div>;
