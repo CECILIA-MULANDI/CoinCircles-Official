@@ -140,10 +140,9 @@ const ChamaList = () => {
     };
 
     const isMember = (chama, userAddress) => {
-        return (
-            chama.listOfMembers.includes(userAddress) ||
-            (contributedUsers[chama.name] && contributedUsers[chama.name].includes(userAddress))
-        );
+        const isInMemberList = chama.listOfMembers.includes(userAddress);
+        const hasContributed = contributedUsers[chama.name]?.includes(userAddress) || false;
+        return isInMemberList || hasContributed;
     };
 
     const formatContributionAmount = (amount) => {
