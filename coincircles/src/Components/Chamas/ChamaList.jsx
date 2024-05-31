@@ -130,7 +130,7 @@ const ChamaList = () => {
           console.log("hasUserContributed:", hasUserContributed);
 console.log("selectedChama:", selectedChama);
 console.log("userContributions:", userContributions);
-          if (hasUserContributed===true) {
+          if (!hasUserContributed) {
             setError('You have already contributed in the current round.');
             return;
           }
