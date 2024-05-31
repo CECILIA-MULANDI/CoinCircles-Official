@@ -265,10 +265,23 @@ const styles = {
         position: 'fixed',
         top: 0,
         left: 0,
-        width: '100'
-    }
-}
-export default ChamaList;
+        width: '100%',
+
+        height: '100%',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalContent: {
+        backgroundColor: 'white',
+        padding: '20px',
+        borderRadius: '10px',
+        textAlign: 'center',
+    },
+};
+
+export default ChamaList;;
 
 
            
