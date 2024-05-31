@@ -183,3 +183,18 @@ export const getChamaId = async (chamaName) => {
   }
 };
 
+export const hasUserContributed = async (chamaId, chamaAddress, userAddress) => {
+  try {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+      
+      const chamaContract = new ethers.Contract(chamaAddress, ContractAbi, signer);
+
+      const hasContributed = await chamaContract.hasContributedInCurrentRound(chamaId, userAddress);
+      
+      return hasContributed;
+  } catch (error) {
+      console.error("Error checking contribution status:", error);
+      return false; // Return false if there's an error
+  }
+};
