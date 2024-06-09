@@ -1,75 +1,77 @@
 import { useState, useEffect } from 'react';
 import Button from "react-bootstrap/Button";
 import { useNavigate } from 'react-router-dom';
-import { ContractAddress } from "../Constants/Constants";
+// import { ContractAddress } from "../Constants/Constants";
 import ContractAbi from "../../artifacts/contracts/Lock.sol/CoinCircles.json";
 import { connectUser } from '../CallContractFunctions/CallContract';
 import { ethers } from 'ethers';
 import { disconnectWallet } from '../CallContractFunctions/CallContract';
-
+const contractAddress = '0xf7C728CED9D6a68E8e08f0aF136A34Cf617130B6';
 export default function ConnectWallet() {
   const [walletAddress, setWalletAddress] = useState(localStorage.getItem('walletAddress'));
   const [error, setError] = useState(null);
   const [provider, setProvider] = useState(null);
-  const [isConnected, setIsConnected] = useState(!!walletAddress);
+  const [isConnected, setIsConnected] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    async function checkConnection() {
-      if (walletAddress) {
-        try {
-          const provider = new ethers.providers.Web3Provider(window.ethereum);
-          const contract = new ethers.Contract(ContractAddress, ContractAbi, provider);
+    console.log("isConnected changed:", isConnected);
+    console.log("window.location.pathname:", window.location.pathname);
   
-          // Check if the wallet address is connected
-          const isConnected = await contract.users(walletAddress).isConnected;
-  
-          setProvider(provider);
-          setIsConnected(isConnected);
-        } catch (error) {
-          console.error('Error checking connection:', error);
-          setError('Error checking connection');
-        }
-      }
-    }
-  
-    checkConnection();
-  }, [walletAddress]);
-
-  useEffect(() => {
-    if (isConnected) {
+    if (isConnected && window.location.pathname !== '/availableChamas') {
       navigate('/availableChamas');
+    } else {
+      console.log("Cannot redirect");
     }
   }, [isConnected, navigate]);
 
+
   const handleConnect = async () => {
     try {
-      const { address, provider, signer } = await connectUser(setWalletAddress, setProvider, setError);
-      setWalletAddress(address);
-      setProvider(provider);
+      const result = await connectUser(setWalletAddress, setProvider, setError);
   
-      // Create an instance of the contract
-      const contract = new ethers.Contract(ContractAddress, ContractAbi, signer);
+      if (result && result.address && result.provider && result.signer) {
+        const { address, provider, signer } = result;
+        setWalletAddress(address);
+        setProvider(provider);
   
-      // Check if the wallet address is already connected
-      const isConnected = await contract.users(address).isConnected;
+        // Create an instance of the contract
+        const contract = new ethers.Contract(contractAddress, ContractAbi, signer);
   
-      if (!isConnected) {
-        // Call the connect_user function if not connected
-        const tx = await contract.connect_user();
-        await tx.wait();
-        setIsConnected(true);
+        try {
+          // Call the connect_user function
+          const tx = await contract.connect_user();
+          await tx.wait();
+  
+          // Set isConnected to true after a successful connection
+          setIsConnected(true);
+          localStorage.setItem('walletAddress', address);
+        } catch (error) {
+          if (error.message.includes('User is already connected')) {
+            // User is already connected, set isConnected to true
+            setIsConnected(true);
+            localStorage.setItem('walletAddress', address);
+          } else {
+            // Handle other contract errors
+            console.error('Contract error:', error);
+            setError('Error connecting wallet: ' + error.message);
+          }
+        }
       } else {
-        setIsConnected(true);
-        console.log('User is already connected');
+        console.error('connectUser function returned invalid result:', result);
+        setError('Error connecting wallet');
       }
-  
-      localStorage.setItem('walletAddress', address);
     } catch (error) {
       console.error('Error connecting wallet:', error);
       setError('Error connecting wallet');
     }
   };
+
+
+
+ 
+
+  
 
   const handleDisconnect = () => {
     disconnectWallet(setWalletAddress);

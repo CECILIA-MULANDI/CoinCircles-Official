@@ -8,7 +8,9 @@ export const connectUser = async (setWalletAddress, setProvider, setError) => {
   if (window.ethereum) {
     try {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
-      await provider.send("eth_requestAccounts", []);
+      // await provider.send("eth_requestAccounts", []);
+      window.ethereum.enable()
+      await window.ethereum.request({method: 'eth_requestAccounts'});
       const signer = provider.getSigner();
       const address = await signer.getAddress();
 
@@ -196,5 +198,69 @@ export const hasUserContributed = async (chamaId, chamaAddress, userAddress) => 
   } catch (error) {
       console.error("Error checking contribution status:", error);
       return false; // Return false if there's an error
+  }
+};
+export const voteForRecipient = async (chamaName) => {
+  try {
+    const contract = await connectToContract();
+    const tx = await contract.voteForRecipient(chamaName);
+    await tx.wait();
+  } catch (error) {
+    console.error('Error voting for recipient:', error);
+    throw error;
+  }
+};
+export const getMemberChamasAndAmountReceived = async (memberAddress) => {
+  try {
+    const contract = await connectToContract();
+    const [chamaNames, amountsReceived] = await contract.getMemberChamasAndAmountReceived(memberAddress);
+    return { chamaNames, amountsReceived };
+  } catch (error) {
+    console.error('Error getting member chamas and amounts received:', error);
+    throw error;
+  }
+};
+export const getPossibleRecipients = async (chamaName) => {
+  try {
+    const contract = await connectToContract();
+    const recipients = await contract.getPossibleRecipients(chamaName);
+    return recipients;
+  } catch (error) {
+    console.error('Error getting possible recipients:', error);
+    throw error;
+  }
+};
+export const getCurrentRecipient = async (chamaName) => {
+  try {
+    const contract = await connectToContract();
+    const recipient = await contract.getCurrentRecipient(chamaName);
+    return recipient;
+  } catch (error) {
+    console.error('Error getting current recipient:', error);
+    throw error;
+  }
+};
+export const getUserProfileDetails = async (userAddress) => {
+  try {
+    const contract = await connectToContract();
+    const [chamaNames, amountsReceived] = await contract.getUserProfileDetails(userAddress);
+    return { chamaNames, amountsReceived };
+  } catch (error) {
+    console.error('Error getting user profile details:', error);
+    throw error;
+  }
+};
+
+
+export const listenForFundsSentEvent = async (chamaName, callback) => {
+  try {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const contract = new ethers.Contract(ContractAddress, ContractAbi, provider);
+
+      contract.on('FundsSent', (recipient, amount, event) => {
+          callback(recipient, amount);
+      });
+  } catch (error) {
+      console.error('Error listening for FundsSent event:', error);
   }
 };

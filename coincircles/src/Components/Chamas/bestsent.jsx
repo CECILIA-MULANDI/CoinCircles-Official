@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getAllChamas, addMemberToPrivateChama, joinChama, isMinimumNumberOfPeopleReached, getContributionAmount, voteForRecipient, getCurrentRecipient } from '../CallContractFunctions/CallContract';
+import { getAllChamas, addMemberToPrivateChama, joinChama, isMinimumNumberOfPeopleReached, getContributionAmount, voteForRecipient, getCurrentRecipient,listenForFundsSentEvent } from '../CallContractFunctions/CallContract';
 import { ethers } from 'ethers';
 import AvailableNavBar from '../NavBar/AvailableNavbar';
 import ContractAbi from "../../artifacts/contracts/Lock.sol/CoinCircles.json";
@@ -18,6 +18,8 @@ const ChamaList = () => {
     const [showVotingModal, setShowVotingModal] = useState(false);
     const [selectedRecipient, setSelectedRecipient] = useState('');
     const [currentRecipient, setCurrentRecipient] = useState(null);
+    const [fundsSent, setFundsSent] = useState(null);
+
 
     const handleSelectChama = async (chamaName) => {
         const selectedChama = chamas.find(chama => chama.name === chamaName);
@@ -53,6 +55,21 @@ const ChamaList = () => {
         };
         fetchChamas();
     }, []);
+    useEffect(() => {
+        const handleFundsSent = (recipient, amount) => {
+            setFundsSent({ recipient, amount });
+        };
+    
+        listenForFundsSentEvent(selectedChama?.name, handleFundsSent);
+    
+        return () => {
+            // Cleanup the event listener when the component unmounts
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const contract = new ethers.Contract(contractAddress, ContractAbi.abi, provider);
+            contract.removeAllListeners('FundsSent');
+        };
+    }, [selectedChama]);
+    
 
     const handleJoinChama = async (chamaName) => {
         try {
@@ -287,6 +304,12 @@ const ChamaList = () => {
                     </div>
                 </div>
             )}
+            {fundsSent && (
+        <div style={styles.message}>
+            <p>Funds of {ethers.utils.formatEther(fundsSent.amount)} ETH have been sent to the recipient:</p>
+            <p>{fundsSent.recipient}</p>
+        </div>
+)}
         </>
     );
 };
