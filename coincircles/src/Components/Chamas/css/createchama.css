@@ -23,3 +23,7 @@
     border-radius: 5px;
     cursor: pointer;
 }
+
+.connect-btn {
+    background-color: '#1fc1c3';
+}

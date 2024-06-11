@@ -1,3 +1,36 @@
-* {
-    color: #0a253b;
+.navbar-separator {
+    height: 1px;
+    background-color: #ccc;
+    margin: 0;
+}
+
+.hero {
+    background-color: #0a253b;
+    padding: 100px 0;
+}
+
+.hero-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    color: #FFFF;
+}
+
+.hero-text h1 {
+    font-size: 7.2vh;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.hero-image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.hero-image img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 20px;
 }

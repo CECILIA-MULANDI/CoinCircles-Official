@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Form, Button, Alert, Card } from 'react-bootstrap';
 import { createChama } from '../CallContractFunctions/CallContract';
-import './css/createchama.css'; // Import CSS for additional styles
-
+import '../Chamas/css/createchama.css'
+import  CreateNavBar from "../NavBar/CreateNavBar"
 const CreateChama = () => {
   const [chamaName, setChamaName] = useState('');
   const [maxMembers, setMaxMembers] = useState('');
@@ -44,6 +44,8 @@ const CreateChama = () => {
   };
 
   return (
+    <>
+    < CreateNavBar/>
     <div className="create-chama-container">
       <Card className="create-chama-card">
         <Card.Body>
@@ -104,13 +106,14 @@ const CreateChama = () => {
               />
             </Form.Group>
 
-            <Button variant="primary" type="submit" className="create-btn">
+            <Button  type="submit" className="create-btn" style={{marginTop:"20px", backgroundColor: '#1fc1c3',border:'None',padding:'10px'}}>
               Create Chama
             </Button>
-          </Form>
+          </Form> 
         </Card.Body>
       </Card>
     </div>
+    </>
   );
 };
 

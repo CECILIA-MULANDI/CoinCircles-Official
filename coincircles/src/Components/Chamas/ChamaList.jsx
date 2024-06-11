@@ -157,6 +157,7 @@ const ChamaList = () => {
             } else {
                 setError(error.message);
             }
+        
         }
     };
 
@@ -242,6 +243,7 @@ const ChamaList = () => {
                     </div>
                 )}
             </div>
+            {error && <div style={{ color: 'red' }}>{error}</div>}
             {showContributionModal && (
                 <div style={styles.modal}>
                     <div style={styles.modalContent}>
@@ -287,6 +289,7 @@ const ChamaList = () => {
                     </div>
                 </div>
             )}
+           
         </>
     );
 };

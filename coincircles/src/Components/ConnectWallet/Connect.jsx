@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import Button from "react-bootstrap/Button";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 // import { ContractAddress } from "../Constants/Constants";
 import ContractAbi from "../../artifacts/contracts/Lock.sol/CoinCircles.json";
 import { connectUser } from '../CallContractFunctions/CallContract';
 import { ethers } from 'ethers';
+import "../Chamas/css/createchama.css"
 import { disconnectWallet } from '../CallContractFunctions/CallContract';
 const contractAddress = '0xf7C728CED9D6a68E8e08f0aF136A34Cf617130B6';
 export default function ConnectWallet() {
@@ -12,8 +13,9 @@ export default function ConnectWallet() {
   const [error, setError] = useState(null);
   const [provider, setProvider] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
+ 
   const navigate = useNavigate();
-
+  const location = useLocation();
   useEffect(() => {
     console.log("isConnected changed:", isConnected);
     console.log("window.location.pathname:", window.location.pathname);
@@ -80,16 +82,23 @@ export default function ConnectWallet() {
     setIsConnected(false);
     localStorage.removeItem('walletAddress');
   };
-
   return (
     <>
       {walletAddress ? (
-        <>
+        location.pathname === '/' ? (
+          <>
+            <h3>Address: {walletAddress.substring(0, 5)}...</h3>
+            <Button className="connect-btn" onClick={handleDisconnect} style={{ backgroundColor: '#1fc1c3', border: 'None' }}>
+              Disconnect
+            </Button>
+          </>
+        ) : (
           <h3>Address: {walletAddress.substring(0, 5)}...</h3>
-          <Button className="connect-btn" onClick={handleDisconnect}>Disconnect</Button>
-        </>
+        )
       ) : (
-        <Button className="connect-btn" onClick={handleConnect}>Connect</Button>
+        <Button className="connect-btn" onClick={handleConnect} style={{ backgroundColor: '#1fc1c3', border: 'None', cursor:'pointer'}}>
+          Connect
+        </Button>
       )}
       {error && <p style={{ color: 'red' }}>{error}</p>}
     </>
