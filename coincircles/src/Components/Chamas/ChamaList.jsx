@@ -194,6 +194,7 @@ const ChamaList = () => {
             <AvailableNavBar />
             <div style={styles.page}>
                 <h2 style={styles.heading}>Available Chamas</h2>
+                {error && <div style={{ color: 'red', textAlign: 'center', marginBottom: '20px' }}>{error}</div>}
                 {chamas.length === 0 ? (
                     <p>No chamas found.</p>
                 ) : (
@@ -243,7 +244,7 @@ const ChamaList = () => {
                     </div>
                 )}
             </div>
-            {error && <div style={{ color: 'red' }}>{error}</div>}
+           
             {showContributionModal && (
                 <div style={styles.modal}>
                     <div style={styles.modalContent}>
